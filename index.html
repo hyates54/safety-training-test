@@ -1019,6 +1019,12 @@ function supStatus(){
 }
 
 function supRoster(){
+  const CARRIERS = [
+    ['','Select carrier'],['att','AT&T'],['verizon','Verizon'],['tmobile','T-Mobile'],
+    ['sprint','Sprint'],['boost','Boost Mobile'],['cricket','Cricket'],['uscellular','US Cellular'],
+    ['metro','Metro by T-Mobile'],['googlefi','Google Fi'],['other','Other/Unknown']
+  ];
+  const carrierOpts = (sel) => CARRIERS.map(([v,l])=>`<option value="${v}" ${sel===v?'selected':''}>${l}</option>`).join('');
   let h = `<div class="cardbox">
     <div class="eyebrow">Add someone</div>
     <div class="row2">
@@ -1029,16 +1035,18 @@ function supRoster(){
           <option value="field">Field</option>
           <option value="shop">Shop only</option>
         </select></div>
+      <div><label class="fld" for="newPhone">Mobile number</label><input type="text" id="newPhone" placeholder="404-555-0100" inputmode="tel"></div>
+      <div><label class="fld" for="newCarrier">Carrier</label><select id="newCarrier">${carrierOpts('')}</select></div>
       <div style="flex:0 0 auto"><button class="btn" id="addEmp">Add to crew</button></div>
     </div>
-    <p class="sub" style="margin:12px 0 0">Shop-only skips fall protection and steel erection. Everything else applies to everybody.</p>
+    <p class="sub" style="margin:12px 0 0">Shop-only skips fall protection and steel erection. Everything else applies to everybody. Phone and carrier are optional but required for text reminders.</p>
   </div>`;
   if(!DB.roster.length) return h;
   h += `<div class="cardbox"><div class="eyebrow">Crew</div>`;
   DB.roster.forEach(e=>{
     const done = MODULES.filter(m=>statusOf(e,m)==='done').length;
     const total = MODULES.filter(m=>applies(e,m)).length;
-    h += `<div class="rosterrow">
+    h += `<div class="rosterrow" style="flex-wrap:wrap;align-items:flex-start">
       <div class="who">${esc(e.name)}${e.active===false?' <span class="pill locked">Inactive</span>':''}
         <div class="tag-meta">${done} of ${total} complete · ${({both:'Shop and field',field:'Field',shop:'Shop only'})[e.role||'both']}</div></div>
       <select data-role="${e.id}" style="width:auto;flex:0 0 auto">
@@ -1046,6 +1054,8 @@ function supRoster(){
         <option value="field" ${e.role==='field'?'selected':''}>Field</option>
         <option value="shop" ${e.role==='shop'?'selected':''}>Shop only</option>
       </select>
+      <input type="text" data-phone="${e.id}" value="${esc(e.phone||'')}" placeholder="Mobile number" style="width:150px;flex:0 0 auto">
+      <select data-carrier="${e.id}" style="width:auto;flex:0 0 auto">${carrierOpts(e.carrier||'')}</select>
       <button class="btn ghost sm" data-toggle="${e.id}">${e.active===false?'Reactivate':'Set inactive'}</button>
       <button class="btn ghost sm" data-del="${e.id}">Remove</button>
     </div>`;
@@ -1210,15 +1220,27 @@ function wire(){
   if(addEmp) addEmp.onclick = async ()=>{
     const name=document.getElementById('newName').value.trim();
     const role=document.getElementById('newRole').value;
+    const phone=document.getElementById('newPhone').value.trim();
+    const carrier=document.getElementById('newCarrier').value;
     if(!name){ toast('Enter a name first.'); return; }
     const id='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-    await commit(d=>{ d.roster.push({id,name,role,active:true}); });
+    await commit(d=>{ d.roster.push({id,name,role,phone,carrier,active:true}); });
     toast(name+' added to the crew.'); render();
   };
   document.querySelectorAll('[data-role]').forEach(sel=>sel.onchange=async ()=>{
     const id=sel.dataset.role, v=sel.value;
     await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.role=v; });
     render();
+  });
+  document.querySelectorAll('[data-phone]').forEach(inp=>inp.onchange=async ()=>{
+    const id=inp.dataset.phone, v=inp.value.trim();
+    await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.phone=v; });
+    toast('Phone number saved.');
+  });
+  document.querySelectorAll('[data-carrier]').forEach(sel=>sel.onchange=async ()=>{
+    const id=sel.dataset.carrier, v=sel.value;
+    await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.carrier=v; });
+    toast('Carrier saved.');
   });
   document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=async ()=>{
     const id=b.dataset.toggle;
