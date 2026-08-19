@@ -1,0 +1,1437 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wilson Welding Service — Safety Training</title>
+
+<!-- PWA: installable, home-screen app -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16352A">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WWS Safety">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Firebase (real-time shared database) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+<style>
+:root{
+  --zinc:#D7DBD3;
+  --zinc-dk:#C3C8BF;
+  --plate:#EEF0EA;
+  --ink:#161B15;
+  --slag:#6E756B;
+  --hair:#B6BCB1;
+  --lens:#16352A;
+  --lens-2:#2A5943;
+  --straw:#C08E1C;
+  --straw-lt:#F0DCA6;
+  --cherry:#A4321C;
+  --cherry-lt:#EFD3CB;
+  --temper:#2B4C7E;
+  --disp:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--zinc);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-text-size-adjust:100%;
+  background-image:
+    repeating-linear-gradient(90deg,rgba(22,27,21,.022) 0 1px,transparent 1px 4px);
+}
+.wrap{max-width:940px;margin:0 auto;padding:0 18px 72px}
+
+/* ---------- masthead ---------- */
+.mast{
+  border-bottom:2px solid var(--ink);
+  padding:20px 0 12px;
+  margin-bottom:26px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.mast h1{
+  font-family:var(--disp);
+  font-weight:800;
+  font-size:clamp(30px,7vw,46px);
+  line-height:.92;
+  letter-spacing:.01em;
+  text-transform:uppercase;
+  margin:0;
+}
+.mast h1 span{display:block;font-size:.42em;font-weight:600;letter-spacing:.22em;color:var(--lens);margin-top:6px}
+.mast-right{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--slag);text-align:right}
+.mast-right b{display:block;color:var(--ink);font-weight:600;font-size:12px}
+
+/* ---------- generic ---------- */
+h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:26px;margin:0 0 4px}
+h3{font-family:var(--body);font-weight:600;font-size:16px;margin:22px 0 6px}
+p{margin:0 0 12px}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--slag);margin-bottom:8px}
+.sub{color:var(--slag);font-size:14px;margin:0 0 22px}
+.hr{height:1px;background:var(--hair);border:0;margin:26px 0}
+
+button{font-family:var(--body);cursor:pointer}
+.btn{
+  display:inline-block;border:1.5px solid var(--ink);background:var(--ink);color:var(--plate);
+  font-weight:600;font-size:15px;padding:13px 22px;border-radius:2px;letter-spacing:.01em;
+  min-height:48px;
+}
+.btn:hover{background:var(--lens);border-color:var(--lens)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--plate)}
+.btn.sm{font-size:13px;padding:9px 14px;min-height:40px}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn:disabled:hover{background:var(--ink);border-color:var(--ink)}
+.linkish{background:none;border:0;padding:0;color:var(--lens);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--temper);outline-offset:2px}
+
+input[type=text],input[type=password],select{
+  font-family:var(--body);font-size:15px;padding:11px 12px;border:1.5px solid var(--hair);
+  background:var(--plate);color:var(--ink);border-radius:2px;min-height:46px;width:100%;
+}
+input:focus,select:focus{border-color:var(--lens)}
+
+/* ---------- the shop tag (signature) ---------- */
+.tag{
+  position:relative;background:var(--plate);border:1.5px solid var(--ink);border-radius:2px;
+  padding:18px 20px 18px 54px;margin-bottom:12px;text-align:left;width:100%;display:block;
+}
+.tag::before{ /* punch hole */
+  content:'';position:absolute;left:20px;top:22px;width:14px;height:14px;border-radius:50%;
+  background:var(--zinc);border:1.5px solid var(--ink);
+}
+.tag::after{ /* stamped edge */
+  content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--ink);
+}
+.tag .tag-code{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--slag);text-transform:uppercase}
+.tag .tag-title{font-family:var(--disp);font-weight:700;font-size:21px;line-height:1.02;text-transform:uppercase;letter-spacing:.02em;margin:3px 0 5px}
+.tag .tag-meta{font-family:var(--mono);font-size:11px;color:var(--slag);letter-spacing:.04em}
+button.tag{cursor:pointer}
+button.tag:hover{background:#fff;border-color:var(--lens)}
+button.tag:hover::after{background:var(--lens)}
+
+.tag.state-due::after{background:var(--straw)}
+.tag.state-overdue::after{background:var(--cherry)}
+.tag.state-done::after{background:var(--lens-2)}
+.tag.state-locked{opacity:.62}
+.tag.state-locked::after{background:var(--hair)}
+
+.stamp{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-7deg);
+  font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.14em;text-transform:uppercase;
+  border:2.5px solid var(--lens-2);color:var(--lens-2);padding:3px 9px;border-radius:2px;opacity:.85;
+  white-space:nowrap;
+}
+.pill{
+  display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 8px;border:1.5px solid currentColor;border-radius:2px;font-weight:600;
+}
+.pill.due{color:#8A6410;background:var(--straw-lt)}
+.pill.overdue{color:var(--cherry);background:var(--cherry-lt)}
+.pill.done{color:var(--lens-2);background:#D8E6DE}
+.pill.locked{color:var(--slag);background:var(--zinc-dk)}
+
+/* ---------- hero: this month ---------- */
+.hero{
+  background:var(--lens);color:#E8EDE7;border-radius:2px;padding:26px 24px;margin-bottom:8px;
+  position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;right:-40px;top:-40px;width:170px;height:170px;
+  background:repeating-linear-gradient(45deg,rgba(232,237,231,.07) 0 8px,transparent 8px 16px);
+}
+.hero .eyebrow{color:#9BB6A8;margin-bottom:10px}
+.hero h2{font-size:clamp(26px,6vw,38px);line-height:.95;margin-bottom:10px;color:#F2F5F0}
+.hero .refs{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:#9BB6A8;margin-bottom:18px}
+.hero .btn{background:var(--straw);border-color:var(--straw);color:#1A1405}
+.hero .btn:hover{background:#DCA82A;border-color:#DCA82A}
+.hero .btn.ghost{background:transparent;color:#E8EDE7;border-color:#7C9A8B}
+.hero .btn.ghost:hover{background:#E8EDE7;color:var(--lens)}
+.hero .done-note{font-family:var(--mono);font-size:12px;color:#B9D0C3;letter-spacing:.04em}
+
+/* ---------- roster sign-in ---------- */
+.grid-names{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.namebtn{
+  background:var(--plate);border:1.5px solid var(--ink);border-radius:2px;padding:16px 14px;text-align:left;
+  font-family:var(--disp);font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.02em;
+  color:var(--ink);line-height:1.05;
+}
+.namebtn small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--slag);font-weight:400;margin-top:6px}
+.namebtn:hover{background:var(--lens);color:#EEF0EA;border-color:var(--lens)}
+.namebtn:hover small{color:#9BB6A8}
+.namebtn .flag{color:var(--cherry)}
+.namebtn:hover .flag{color:var(--straw)}
+
+/* ---------- reader ---------- */
+.reader{background:var(--plate);border:1.5px solid var(--ink);border-radius:2px;padding:24px 22px}
+.reader ul{margin:0 0 14px;padding-left:20px}
+.reader li{margin-bottom:7px}
+.reader .lead{font-size:17px}
+.stepbar{display:flex;gap:4px;margin-bottom:20px}
+.stepbar i{flex:1;height:5px;background:var(--zinc-dk);border-radius:1px}
+.stepbar i.on{background:var(--lens)}
+.stepnum{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--slag);text-transform:uppercase;margin-bottom:14px}
+.callout{border-left:4px solid var(--cherry);background:var(--cherry-lt);padding:12px 14px;margin:0 0 14px;font-size:14.5px}
+.callout b{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;display:block;color:var(--cherry);margin-bottom:4px}
+.navrow{display:flex;justify-content:space-between;gap:10px;margin-top:22px;align-items:center;flex-wrap:wrap}
+
+/* ---------- quiz ---------- */
+.q{background:var(--plate);border:1.5px solid var(--hair);border-radius:2px;padding:18px 18px 8px;margin-bottom:12px}
+.q.flag-wrong{border-color:var(--cherry);border-width:2px}
+.q.flag-right{border-color:var(--lens-2);border-width:2px}
+.q .qn{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--slag);text-transform:uppercase}
+.q .qt{font-weight:600;margin:5px 0 12px;font-size:15.5px}
+.opt{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1.5px solid var(--hair);
+  border-radius:2px;margin-bottom:8px;cursor:pointer;background:#fff;font-size:15px}
+.opt:hover{border-color:var(--lens)}
+.opt input{margin:3px 0 0;accent-color:var(--lens);width:19px;height:19px;flex:0 0 auto}
+.opt.correct{border-color:var(--lens-2);background:#DEEAE3}
+.opt.chosen-wrong{border-color:var(--cherry);background:var(--cherry-lt)}
+.why{font-size:13.5px;color:var(--slag);border-top:1px solid var(--hair);padding:10px 0;margin-top:2px}
+.why b{color:var(--ink)}
+
+.result{border:2px solid var(--ink);background:var(--plate);border-radius:2px;padding:26px 22px;text-align:center;margin-bottom:18px}
+.result .score{font-family:var(--disp);font-weight:800;font-size:58px;line-height:.9}
+.result.pass{border-color:var(--lens-2)}
+.result.pass .score{color:var(--lens-2)}
+.result.fail{border-color:var(--cherry)}
+.result.fail .score{color:var(--cherry)}
+.result .verdict{font-family:var(--disp);font-weight:700;font-size:23px;text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.result .rmeta{font-family:var(--mono);font-size:11.5px;color:var(--slag);letter-spacing:.06em;margin-top:8px}
+
+/* ---------- supervisor ---------- */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--ink);margin-bottom:22px;flex-wrap:wrap}
+.tabs button{
+  background:transparent;border:0;border-bottom:4px solid transparent;padding:11px 15px;
+  font-family:var(--disp);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.06em;color:var(--slag);
+}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--straw)}
+.matrix-scroll{overflow-x:auto;border:1.5px solid var(--ink);border-radius:2px;background:var(--plate)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 9px;text-align:left;border-bottom:1px solid var(--hair);white-space:nowrap}
+thead th{background:var(--ink);color:var(--plate);font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:500;position:sticky;top:0}
+tbody tr:hover{background:#fff}
+td.nm{font-weight:600}
+.cell{display:inline-block;width:26px;height:26px;line-height:24px;text-align:center;border:1.5px solid;border-radius:2px;
+  font-family:var(--mono);font-size:11px;font-weight:600}
+.cell.done{border-color:var(--lens-2);background:#D8E6DE;color:var(--lens-2)}
+.cell.due{border-color:var(--straw);background:var(--straw-lt);color:#8A6410}
+.cell.overdue{border-color:var(--cherry);background:var(--cherry-lt);color:var(--cherry)}
+.cell.locked{border-color:var(--hair);background:var(--zinc-dk);color:var(--slag)}
+.cell.na{border-color:transparent;background:transparent;color:var(--hair)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--slag);margin:12px 0 0}
+.legend span{display:flex;align-items:center;gap:7px}
+.swatch{width:14px;height:14px;border:1.5px solid;border-radius:2px}
+.rosterrow{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--hair);flex-wrap:wrap}
+.rosterrow .who{font-weight:600;flex:1 1 150px}
+.cardbox{background:var(--plate);border:1.5px solid var(--ink);border-radius:2px;padding:20px;margin-bottom:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--plate);border:1.5px solid var(--ink);border-radius:2px;padding:14px 16px}
+.kpi b{display:block;font-family:var(--disp);font-weight:800;font-size:34px;line-height:1}
+.kpi span{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--slag)}
+.kpi.warn b{color:var(--cherry)}
+.kpi.ok b{color:var(--lens-2)}
+.row2{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row2 > div{flex:1 1 160px}
+label.fld{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--slag);margin-bottom:5px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--plate);
+  padding:12px 20px;border-radius:2px;font-size:14px;z-index:99;box-shadow:0 6px 24px rgba(0,0,0,.28);max-width:90vw}
+.warnbox{border-left:4px solid var(--straw);background:var(--straw-lt);padding:12px 14px;font-size:14px;margin-bottom:18px}
+.warnbox b{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;display:block;color:#8A6410;margin-bottom:3px}
+
+@media (max-width:560px){
+  .mast{align-items:flex-start}
+  .mast-right{text-align:left}
+  .tag{padding-left:46px}
+  .stamp{position:static;transform:none;display:inline-block;margin-top:8px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .stamp{animation:stampin .34s cubic-bezier(.2,1.5,.4,1) both}
+  @keyframes stampin{from{transform:translateY(-50%) rotate(-7deg) scale(1.9);opacity:0}
+                     to{transform:translateY(-50%) rotate(-7deg) scale(1);opacity:.85}}
+}
+
+/* ---------- print: sign-in sheet ---------- */
+.sheet{display:none}
+@media print{
+  body{background:#fff;font-size:11.5pt;background-image:none;color:#000}
+  .noprint,.wrap{display:none !important}
+  .sheet{display:block}
+  .pdoc{font-family:Georgia,'Times New Roman',serif;line-height:1.45}
+  .pdoc h1,.pdoc h2{font-family:Georgia,serif}
+  .pdoc h3{font-size:11.5pt;margin:12px 0 4px;font-family:Georgia,serif}
+  .pdoc p{margin:0 0 9px}
+  .pdoc ul,.pdoc ol{margin:0 0 10px;padding-left:24px}
+  .pdoc li{margin-bottom:4px}
+  .pdoc .lead{font-size:12pt}
+  .pdoc .callout{border:1px solid #000;border-left:5px solid #000;padding:8px 11px;margin:0 0 11px;background:#f0f0f0}
+  .pdoc .callout b{display:block;text-transform:uppercase;font-size:9pt;letter-spacing:.08em;margin-bottom:3px}
+  .sheet table{width:100%;border-collapse:collapse}
+  .sheet th,.sheet td{border:1px solid #000;padding:9px;text-align:left}
+  .sheet td.sig{height:36px}
+  .pdoc h2{page-break-after:avoid}
+}
+</style>
+
+<div class="wrap">
+  <div class="mast noprint">
+    <h1>Wilson Welding<span>Safety Training</span></h1>
+    <div class="mast-right">
+      <b id="mastMonth">—</b>
+      <div id="mastWho">Not signed in</div>
+    </div>
+  </div>
+  <div id="app"></div>
+</div>
+<div class="sheet" id="printArea"></div>
+
+<script>
+/* ============================================================
+   WILSON WELDING SERVICE — SAFETY TRAINING TRACKER
+   Single file. Records persist in shared artifact storage.
+   Supervisor PIN default: 1994  (change under Settings)
+   ============================================================ */
+
+const PASS_PCT  = 80;
+
+/* ============================================================
+   FIREBASE SETUP
+   1. Go to https://console.firebase.google.com/
+   2. Create a project (free Spark plan is enough)
+   3. Build > Firestore Database > Create database > Start in
+      production mode > pick a location > Enable
+   4. Project settings (gear icon) > General > "Your apps" >
+      click the </> (web) icon > register an app (nickname
+      anything, e.g. "wws-training") > it shows a firebaseConfig
+      object. Copy that whole object and paste it below,
+      replacing the placeholder.
+   5. Firestore > Rules tab, replace the rules with:
+
+      rules_version = '2';
+      service cloud.firestore {
+        match /databases/{database}/documents {
+          match /wws/{docId} {
+            allow read, write: if true;
+          }
+        }
+      }
+
+      Click Publish. (This keeps access scoped to just this
+      app's one document instead of opening your whole project.)
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "firebaseConfig = {
+    apiKey: "AIzaSyCcjsG598_9mMN4MM9XpI4XS9gzPxIlD-g",
+    authDomain: "safety-test-66aa1.firebaseapp.com",
+    projectId: "safety-test-66aa1",
+    storageBucket: "safety-test-66aa1.firebasestorage.app",
+    messagingSenderId: "288428805559",
+    appId: "1:288428805559:web:aa3019b72f15ad4367ec32"
+  };",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+  messagingSenderId: "PASTE_YOUR_SENDER_ID",
+  appId: "PASTE_YOUR_APP_ID"
+};
+
+let fsDb = null;
+let fbReady = false;
+try{
+  if(firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_')){
+    firebase.initializeApp(firebaseConfig);
+    fsDb = firebase.firestore();
+    fbReady = true;
+  }
+}catch(e){ console.error('Firebase init failed', e); }
+
+const DOC_REF = () => fsDb.collection('wws').doc('training');
+
+/* ---------- 12-month schedule + content ---------- */
+const MODULES = [
+{ id:'M01', month:'2026-08', title:'Heat Illness Under PPE', refs:'OSHA 5(a)(1) General Duty · NIOSH Criteria', cycle:'Seasonal — every summer', scope:'all', delivered:true,
+  sections:[
+   {h:'Why welders go down first', b:`<p class="lead">A welder in leathers, hood, and a long-sleeve FR shirt is wearing the equivalent of a personal greenhouse. The gear that protects you from spatter and UV also stops sweat from evaporating, and evaporation is how the body dumps heat.</p>
+   <p>Stack that on top of radiant heat off the arc, off preheated plate, off a Decatur roof in August, and off the firebox of anything you're working next to. Two men in the same shop can be at very different risk depending on what they're wearing and what they're standing next to.</p>
+   <ul><li>Heavy leathers and FR clothing cut evaporative cooling sharply.</li><li>Radiant heat from the arc, the plate, and the sun all add up.</li><li>Field work with no shade and no breeze is worse than the shop.</li><li>Enclosed or confined work — tanks, ductwork, crawl spaces — is the worst case.</li></ul>`},
+   {h:'Getting acclimatized', b:`<p>Your body adapts to working in heat, but it takes days, not hours. Most fatal heat cases happen in the first few days on a hot job — new hires, guys back from vacation or medical leave, or anyone hitting the first real heat wave of the year.</p>
+   <ul><li><b>New or returning worker:</b> roughly 20% of a normal hot-work shift on day one, adding about 20% each day.</li><li><b>Everybody, first hot spell of the year:</b> ease in. Being acclimatized last September does not carry over.</li><li>Acclimatization fades after about a week away from heat.</li></ul>
+   <div class="callout"><b>Watch the new guy</b>A worker in his first week does not know his own limit yet and will not want to be the one who asks for a break. Somebody senior needs to be watching him.</div>`},
+   {h:'Water, rest, shade', b:`<p>Thirst lags behind dehydration. By the time you feel thirsty you are already behind, and once you are behind it is hard to catch up during a shift.</p>
+   <ul><li>About one cup of water every 15–20 minutes while working in heat — roughly a quart an hour. Not a gallon at lunch.</li><li>Cool water beats ice-cold; cold water is harder to drink in volume.</li><li>Take breaks out of the sun, hood off, jacket open, before you feel bad rather than after.</li><li>Energy drinks and heavy caffeine are not hydration. Alcohol the night before shows up the next afternoon.</li></ul>`},
+   {h:'Heat exhaustion vs. heat stroke', b:`<p>These are two different things and only one of them is an emergency call.</p>
+   <h3>Heat exhaustion</h3><ul><li>Heavy sweating, cool clammy skin</li><li>Weakness, dizziness, headache, nausea</li><li>Muscle cramps, fast weak pulse</li><li><b>Still thinking clearly.</b></li></ul>
+   <h3>Heat stroke — call 911</h3><ul><li><b>Confusion, slurred speech, staggering, acting strange, passing out</b></li><li>Skin may be hot and dry, or still sweating — do not wait for dry skin</li><li>Very high body temperature, seizures</li></ul>
+   <div class="callout"><b>The dividing line</b>Change in how somebody is thinking or acting. A man who cannot tell you where he is or who argues that he is fine while swaying on his feet is a heat stroke until proven otherwise.</div>`},
+   {h:'What you do about it', b:`<h3>Heat exhaustion</h3><ul><li>Get him out of the heat and out of the gear — hood, jacket, sleeves off.</li><li>Cool water to drink, cool wet rags on the neck, head, armpits, groin.</li><li>Stay with him. If he does not clearly improve in about 15 minutes, or gets worse, treat it as heat stroke.</li></ul>
+   <h3>Heat stroke</h3><ul><li><b>Call 911 first.</b></li><li>Start cooling immediately — do not wait for the ambulance. Strip the gear, cold water over the body, ice packs to neck/armpits/groin, fan him.</li><li>Nothing to drink if he is not fully alert.</li><li><b>Never leave him alone.</b></li></ul>
+   <p>Tell your foreman if you are on a medication that affects sweating, blood pressure, or fluids, or if you have had a heat problem before. That stays between you and the shop and it changes how we watch you.</p>`}
+  ],
+  quiz:[
+   {q:"Which sign points to heat stroke rather than heat exhaustion?",o:["Heavy sweating","Muscle cramps in the legs","Confusion or slurred speech","Feeling thirsty"],a:2,
+    e:"Any change in mental status — confusion, slurred speech, staggering, passing out — means heat stroke. Call 911 and start cooling."},
+   {q:"A new hire starts on a hot field job Monday. What should his first day look like?",o:["About 20% of a normal hot-work day, building up about 20% daily","Full shift but with extra water","Keep him inside all week","Full shift, he will adjust"],a:0,
+    e:"Acclimatization takes days. Roughly 20% exposure on day one with about 20% more each day. Most heat fatalities hit workers in their first days on a hot job."},
+   {q:"How should you take water in while working in heat?",o:["A gallon at lunch to load up","Only when you feel thirsty","Energy drinks instead of water","About a cup every 15–20 minutes"],a:3,
+    e:"About a cup every 15–20 minutes, roughly a quart an hour. Thirst lags behind dehydration, so drinking on a schedule beats drinking on feel."},
+   {q:"Why does welding PPE raise heat illness risk?",o:["It is heavier than street clothes","It traps heat and blocks sweat from evaporating","It is usually dark colored","It makes you drink less water"],a:1,
+    e:"Evaporation is the body’s main cooling method. Leathers and FR clothing block it, so heat builds up even in moderate temperatures."},
+   {q:"A coworker with heat stroke symptoms — what comes first?",o:["Walk him to his truck to rest","Give him cold water to drink","Call 911 and start cooling him right away","Wait 15 minutes to see if he improves"],a:2,
+    e:"Heat stroke is a 911 call and cooling starts immediately. Waiting to see and giving fluids to someone not fully alert both cost time you do not have."}
+  ]},
+
+{ id:'M02', month:'2026-09', title:'Hot Work & Fire Prevention', refs:'29 CFR 1910.252(a) · NFPA 51B', cycle:'Annual', scope:'all', delivered:true,
+  sections:[
+   {h:'The 35-foot rule', b:`<p class="lead">Before an arc is struck or a torch is lit, combustibles come out of the area. If they cannot be moved, they get covered with flame-resistant guards or shields.</p>
+   <ul><li><b>35 feet</b> in all directions from the work is the baseline clear radius.</li><li>Sparks and hot slag travel further than people expect, and they roll, bounce, and fall.</li><li>What counts as combustible: cardboard, rags, wood scrap, pallets, paint and solvent cans, plastic sheeting, insulation, dry vegetation, sawdust, oily floors.</li><li>Move the work to a safe place before you make the place safe for the work — if the part can come to the shop bay, bring it.</li></ul>`},
+   {h:'Openings and what is on the other side', b:`<p>Most hot work fires do not start where the welder is looking. They start in the next room, in the floor below, or inside a wall.</p>
+   <ul><li>Cracks in floors and walls, conveyor openings, and pipe penetrations within 35 feet get covered.</li><li>Check the far side of any wall or floor you are welding on — heat conducts straight through and can ignite what is stacked against it.</li><li>On grating and elevated decks, assume everything falls. Clear or shield the area below and keep people out of it.</li><li>Ductwork and conveyors can carry sparks a long way. Shut them down or block them.</li></ul>`},
+   {h:'The fire watch', b:`<p>A fire watch is a job, not a title. Assign it to somebody who is doing nothing else.</p>
+   <ul><li>Required whenever more than a minor fire could develop, or combustibles are closer than 35 feet, or combustibles on the other side of a wall or floor could ignite.</li><li>The watch must be trained on the extinguisher, know how to sound the alarm, and stay in the area.</li><li>The watch keeps watching <b>at least 30 minutes after the work stops</b>, and then does a final check of the whole area including adjacent spaces.</li><li>Smoldering fires in insulation, wood, or debris can take that long to show themselves.</li></ul>
+   <div class="callout"><b>No fire watch, no hot work</b>If the area needs a watch and nobody is free to be the watch, the work waits. That is not a judgment call to make alone — get the foreman.</div>`},
+   {h:'Containers, tanks, and piping', b:`<p>This is where hot work kills people.</p>
+   <ul><li><b>Never</b> cut or weld on a drum, tank, or pipe that held a flammable or unknown substance until it has been cleaned, purged, and tested safe.</li><li>"It smells empty" is not tested. Residue and vapor in an empty container is the explosive condition — a full one has no room for air.</li><li>Hollow or sealed members can build pressure when heated. Vent them.</li><li>Painted, coated, galvanized, or lined surfaces need to be considered for both fire and fume before you start.</li></ul>`},
+   {h:'Equipment and housekeeping', b:`<ul><li>An extinguisher of the right type stays within immediate reach — not around the corner.</li><li>Inspect leads, holders, torches, and hoses before use. A damaged lead is both a shock hazard and an ignition source.</li><li>Shut off machines and close cylinder valves when you break for lunch or the end of the day.</li><li>Do not lay a hot electrode holder or torch down on the bench where it can arc or ignite something.</li><li>Sweep up. A shop floor covered in grinding dust, cardboard, and oily rags is a fire waiting on a spark.</li></ul>`}
+  ],
+  quiz:[
+   {q:"What is the baseline radius for clearing combustibles around hot work?",o:["35 feet","50 feet","10 feet","20 feet"],a:0,
+    e:"35 feet in all directions. If combustibles cannot be moved, they get shielded with flame-resistant covers."},
+   {q:"How long must a fire watch stay after the welding stops?",o:["5 minutes","No watch needed once the arc is off","Until the metal cools to the touch","At least 30 minutes, then a final check"],a:3,
+    e:"At least 30 minutes of continued watch, then a full check of the area and adjacent spaces. Smoldering fires take time to show."},
+   {q:"You need to weld a bracket on a drum that used to hold solvent. What do you do?",o:["Fill it with water first and go ahead","Do not weld until it is cleaned, purged, and tested safe","Weld only on the outside","Weld it if the drum smells empty"],a:1,
+    e:"Residual vapor in an \"empty\" container is the explosive condition. Cleaned, purged, and tested — no shortcuts, no exceptions."},
+   {q:"Why check the far side of a wall before welding on it?",o:["It is not necessary if the wall is steel","To see if the paint matches","Heat conducts through and can ignite combustibles stacked on the other side","To find the studs"],a:2,
+    e:"Conducted heat through a wall or floor ignites what is stacked against it. Fires start where the welder cannot see them."},
+   {q:"Who can serve as fire watch?",o:["A trained person assigned to that job and nothing else","The welder, watching between passes","The foreman, from the office","Anybody standing nearby"],a:0,
+    e:"The watch does nothing else, is trained on the extinguisher, knows how to sound the alarm, and stays in the area."}
+  ]},
+
+{ id:'M03', month:'2026-10', title:'Welding Fume & Respiratory Protection', refs:'29 CFR 1910.252(c) · 1910.134 · 1910.1026', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'What is actually in the smoke', b:`<p class="lead">Welding fume is not smoke from burning something. It is metal boiled off and condensed into particles small enough to reach deep into your lungs. What is in it depends on the base metal, the coating on it, and the rod or wire.</p>
+   <ul><li><b>Manganese</b> — in mild steel and most filler metals. Long-term overexposure causes permanent nerve damage that looks like Parkinson's.</li><li><b>Hexavalent chromium</b> — from stainless steel and chrome-bearing alloys. A known carcinogen with its own OSHA standard.</li><li><b>Nickel</b> — stainless and nickel alloys. Carcinogen, respiratory sensitizer.</li><li><b>Zinc</b> — from galvanized. Causes metal fume fever.</li><li><b>Cadmium and lead</b> — from some coatings, platings, and old paint. Serious acute and chronic toxicity.</li><li><b>Gases</b> — ozone, nitrogen oxides, carbon monoxide, and phosgene where chlorinated solvents are present.</li></ul>`},
+   {h:'Galvanized and metal fume fever', b:`<p>Welding or cutting galvanized steel puts zinc oxide in the air. Symptoms usually show up several hours later, often that evening: chills, fever, sweats, aching, metallic taste, headache, nausea. It passes in a day or two and people write it off as a bug.</p>
+   <ul><li>Grind the coating back from the joint where the design allows it.</li><li>Position yourself out of the plume and use source capture.</li><li>Repeated episodes are not something to shrug off — report it.</li></ul>
+   <div class="callout"><b>Do not clean with chlorinated solvent</b>Brake cleaner and similar chlorinated degreasers near an arc can form phosgene gas. Use only approved cleaners on anything headed for the weld table.</div>`},
+   {h:'Ventilation comes before the respirator', b:`<p>Controls run in order. A respirator is the last line, not the first.</p>
+   <ol><li><b>Substitute</b> — a lower-fume process or consumable where the job allows it.</li><li><b>Local exhaust ventilation</b> — capture at the source. A fume extraction arm, downdraft table, or extraction gun placed close to the arc removes fume before it reaches your face. Placement matters more than airflow rating: a hood two feet away does almost nothing.</li><li><b>General ventilation</b> — dilutes the shop air. Helps the room, not the welder in the plume.</li><li><b>Position</b> — keep your head out of the plume. Do not lean over the work into the rising fume.</li><li><b>Respirator</b> — when the above cannot get exposure low enough.</li></ol>
+   <p>Fans that just blow across the work can push fume into someone else's breathing zone, and on shielded processes they blow away shielding gas and wreck the weld.</p>`},
+   {h:'Confined and enclosed spaces', b:`<p>Welding inside a tank, vessel, pit, or tight enclosure changes everything.</p>
+   <ul><li>Shielding gas — argon, CO2, helium — displaces oxygen and pools in low areas. It is odorless. Men die in these spaces without ever knowing anything was wrong.</li><li>Test the atmosphere before entry and monitor continuously. Continuous mechanical ventilation is required.</li><li>An attendant stays outside with a means of rescue. Never enter to pull someone out yourself without air and a plan.</li><li>Take cylinders and welding machines <b>outside</b> the space. Only the torch, gun, or holder goes in.</li><li>When you break, take the electrode holder or gun out of the space and shut the gas off at the cylinder.</li></ul>`},
+   {h:'Respirator rules', b:`<p>If a tight-fitting respirator is required for a task, three things must happen before you put it on:</p>
+   <ul><li><b>Medical evaluation</b> — a written questionnaire or exam clearing you to wear one.</li><li><b>Fit test</b> — on the make, model, and size you will actually wear, repeated annually.</li><li><b>User seal check</b> — every single time you put it on.</li></ul>
+   <p>Additional rules:</p>
+   <ul><li><b>No facial hair crossing the sealing surface.</b> Not stubble, not a few days growth. A beard defeats the seal and nothing else will fix it.</li><li>Use the right cartridge or filter. A dust mask does not stop gases.</li><li>A loose-fitting PAPR is an option where a tight seal is not workable — different rules, still requires medical evaluation and training.</li><li>Inspect, clean, and store your respirator. A cracked facepiece or a stretched strap is out of service.</li><li>An N95 worn voluntarily when not required has fewer requirements but still needs to fit and needs the shop to know about it.</li></ul>`}
+  ],
+  quiz:[
+   {q:"What is the first line of defense against welding fume?",o:["A shop fan blowing across the bench","Growing used to it","A P100 respirator","Local exhaust ventilation capturing fume at the source"],a:3,
+    e:"Engineering controls come first. Source capture placed close to the arc removes fume before it reaches your breathing zone. Respirators are the last line."},
+   {q:"Welding stainless steel produces which hazard of particular concern?",o:["Zinc oxide","Hexavalent chromium","Carbon monoxide only","Phosgene"],a:1,
+    e:"Stainless and chrome alloys generate hexavalent chromium, a known carcinogen with its own OSHA standard, 1910.1026."},
+   {q:"A man who cut galvanized this afternoon has chills, fever, and aching by 9 pm. Most likely cause?",o:["A cold going around the shop","Arc eye","Metal fume fever from zinc oxide","Heat exhaustion"],a:2,
+    e:"Metal fume fever from zinc oxide. Delayed onset by several hours is the classic pattern and it gets mistaken for the flu."},
+   {q:"Before wearing a tight-fitting respirator on a required task you need:",o:["Medical evaluation, fit test, and a seal check each time","Only a fit test","Only the foreman’s approval","Nothing, just put it on"],a:0,
+    e:"Medical evaluation, fit test on that exact make/model/size, and a user seal check every time. Facial hair at the seal disqualifies you."},
+   {q:"The main atmospheric danger when welding inside a tank is:",o:["Heat only","Loud noise","Too much oxygen","Shielding gas displacing oxygen"],a:3,
+    e:"Argon, CO2, and helium displace oxygen, are odorless, and pool in low spots. Test and monitor the atmosphere, ventilate continuously, and post an attendant."}
+  ]},
+
+{ id:'M04', month:'2026-11', title:'Eye, Face & Skin Protection', refs:'29 CFR 1910.132 · 1910.133 · ANSI Z87.1', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'What the arc does to your eyes', b:`<p class="lead">A welding arc puts out intense ultraviolet, visible, and infrared radiation. UV burns the surface of the eye — photokeratitis, what everybody calls arc eye or a flash burn.</p>
+   <ul><li>Symptoms show up <b>hours later</b>, usually that night: feels like sand in the eye, tearing, light sensitivity, pain.</li><li>It usually heals in a day or two but it is genuinely miserable and it means you took a dose.</li><li>Repeated exposure over years is linked to cataracts.</li><li>Infrared can cause retinal damage. Visible light intensity causes flash blindness.</li></ul>
+   <p>You do not have to be the welder. Most flash burns happen to somebody walking past, fitting up nearby, or holding a part.</p>`},
+   {h:'Picking the right shade', b:`<p>Too light lets radiation through. Too dark makes you crowd the puddle to see it, which puts your face in the fume and hurts the weld. Use the lightest shade that gives you a comfortable view of the puddle, but never below the minimum.</p>
+   <ul><li><b>SMAW, 5/32 in. electrode and under:</b> minimum shade 10</li><li><b>SMAW, heavier electrodes / higher current:</b> shade 12 and up</li><li><b>GMAW and FCAW:</b> shade 10 to 11, higher on heavy current</li><li><b>GTAW:</b> shade 10 to 12 depending on current and material</li><li><b>Carbon arc, plasma:</b> shade 12 to 14</li><li><b>Oxy-fuel cutting and heavy gas welding:</b> shade 4 to 6</li><li><b>Torch brazing and soldering:</b> shade 3 to 4</li></ul>
+   <p>Check the standard's table when you are unsure. An auto-darkening hood still needs the shade set correctly, and it needs its sensors clean and its battery good — test it before you rely on it.</p>`},
+   {h:'Layers, not one thing', b:`<ul><li><b>Safety glasses under the hood, always.</b> ANSI Z87.1 with side shields. The hood goes up constantly for chipping, tacking, and checking, and that is when things get in your eye.</li><li><b>Grinding:</b> face shield <i>and</i> safety glasses. A shield alone lets debris up from underneath. A wheel that comes apart at speed is not stopped by glasses alone.</li><li><b>Chipping slag:</b> glasses at minimum, shield preferred. Hot slag has a way of finding an eye.</li><li><b>Overhead work:</b> button the collar, cape the hood, and expect everything to come straight back down at your face.</li></ul>`},
+   {h:'Protecting everyone else', b:`<ul><li>Put up noncombustible screens or welding curtains before you strike an arc anywhere near other people or a walkway.</li><li>Call out before you strike in an open bay — the courtesy warning is a real control.</li><li>Curtains need to be positioned so somebody cannot see the arc under or around them, and hung so they do not block egress.</li></ul>`},
+   {h:'Skin and clothing', b:`<p>Arc UV burns skin like a bad sunburn, and it does it fast at close range. That is on top of spatter, slag, and radiant heat.</p>
+   <ul><li>Long sleeves down and buttoned, collar closed. No rolled sleeves, no open shirt.</li><li>Leathers for heavy work, overhead, and out-of-position.</li><li><b>No synthetics.</b> Polyester and nylon melt into skin. Cotton, wool, leather, or FR only — and untreated cotton can still catch, so FR is the standard.</li><li>Cuffless pants, worn over the boots, not tucked in. Cuffs and open pockets catch slag and hold it against you.</li><li>No frayed or oily clothing. Oil-soaked cloth ignites readily.</li><li>Gauntlet gloves in good condition. Leather boots, 6 in. or taller, no exposed sock or ankle.</li><li>Take the lighter out of your pocket. Take the phone out of a chest pocket where slag lands.</li></ul>`}
+  ],
+  quiz:[
+   {q:"When do arc eye symptoms usually appear?",o:["Immediately","Hours later, often that night","Only the next week","Only if you look directly at the arc"],a:1,
+    e:"Delayed by several hours, typically showing up that evening as a gritty feeling, tearing, and light sensitivity. Delay is why people underestimate the exposure."},
+   {q:"What is the minimum filter shade for SMAW with a 5/32 in. electrode?",o:["Shade 5","Shade 8","Shade 10","Shade 14"],a:2,
+    e:"Shade 10 minimum. Heavier electrodes and higher current call for shade 12 and up. Use the lightest shade at or above the minimum that lets you see the puddle."},
+   {q:"What do you wear under the welding hood?",o:["ANSI Z87.1 safety glasses with side shields","Reading glasses if needed","A dust mask only","Nothing else is needed"],a:0,
+    e:"Z87.1 glasses with side shields, always. The hood comes up dozens of times a shift and that is when debris gets in."},
+   {q:"Which clothing is unacceptable for welding?",o:["Cuffless pants over the boots","Buttoned cotton FR long sleeves","Leather gauntlet gloves","A polyester shirt"],a:3,
+    e:"Synthetics melt into skin. Cotton FR, wool, and leather only, with cuffless pants worn over the boots and no oily or frayed clothing."},
+   {q:"How do you keep from flashing others in an open bay?",o:["Weld fast","Set up noncombustible screens or curtains and warn people","Ask them to look away","Turn the amps down"],a:1,
+    e:"Noncombustible screens or welding curtains, positioned so nobody can catch the arc around or under them, plus a verbal warning before you strike."}
+  ]},
+
+{ id:'M05', month:'2026-12', title:'Compressed Gas Cylinders & Oxy-Fuel', refs:'29 CFR 1910.253 · 1910.101', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'A cylinder is a bomb with a valve on it', b:`<p class="lead">A full cylinder holds enough stored energy that snapping the valve off turns it into a rocket capable of going through a block wall. Nearly every serious cylinder incident traces back to handling, not to the gas.</p>
+   <ul><li>Stored, moved, and used <b>upright and secured</b> — chain, strap, or cylinder cart. Never freestanding, never lying loose in a truck bed.</li><li><b>Valve cap on</b> any time the cylinder is not in use and any time it is being moved.</li><li>Never lift by the cap or the valve. Use a cradle, cage, or proper cart. A sling or magnet on a bare cylinder is not acceptable.</li><li>Do not drop, strike, or use a cylinder as a roller, support, or workpiece.</li><li>Never strike an arc on a cylinder or let a work lead touch one.</li></ul>`},
+   {h:'Storage and separation', b:`<ul><li><b>Oxygen and fuel gas cylinders must be separated by 20 feet, or by a noncombustible barrier at least 5 feet high with a fire-resistance rating of at least a half hour.</b></li><li>Keep cylinders away from heat, sparks, slag, open flame, and electrical circuits.</li><li>Store fulls and empties separately and mark empties MT.</li><li>Do not store cylinders in stairwells, exits, or where they can be knocked over by traffic.</li><li>Never store cylinders in an unventilated closed space, including a van or truck box.</li></ul>`},
+   {h:'Oxygen and oil do not mix', b:`<p>Pure oxygen makes things burn that normally would not, and makes ordinary combustibles burn violently. Oil or grease in an oxygen system can ignite from the heat of compression alone.</p>
+   <ul><li><b>No oil, grease, or oily rags</b> on oxygen cylinders, valves, regulators, hoses, or fittings — and no oily gloves handling them.</li><li>Open the oxygen cylinder valve <b>slowly</b> to let the regulator come up gradually.</li><li>Never use oxygen to blow off dust, cool yourself, purge a line, or pressurize anything. Oxygen-saturated clothing ignites from a spark and burns fiercely.</li><li>Never use a fuel-gas regulator on oxygen or vice versa. Never modify or force a fitting.</li></ul>
+   <div class="callout"><b>Oxygen is not air</b>Using oxygen where you would use shop air is a recurring cause of fatal burn injuries. Air is air. Oxygen is not.</div>`},
+   {h:'Acetylene specifics', b:`<ul><li><b>Never exceed 15 psig working pressure on acetylene.</b> Above that it becomes unstable and can decompose explosively with no oxygen present at all.</li><li>Acetylene cylinders must be used and stored <b>upright</b>. The cylinder is packed with a porous filler saturated in acetone; on its side the acetone comes out with the gas.</li><li>If a cylinder has been on its side, stand it upright for at least 30 minutes — an hour is better — before use.</li><li>Open the acetylene valve no more than about three-quarters of a turn to one full turn so it can be shut fast.</li><li>Acetylene attacks copper. Never use copper tubing or copper-bearing fittings on an acetylene line.</li></ul>`},
+   {h:'Torch setup, use, and shutdown', b:`<h3>Setup</h3>
+   <ul><li>Inspect hoses for burns, cracks, worn spots, and loose connections. Repair with proper couplings — no tape.</li><li><b>Reverse-flow check valves and flashback arrestors</b> installed and working.</li><li>Crack the cylinder valve away from people to blow out dust before mounting the regulator.</li><li>Leak test with approved leak detection solution or soapy water. <b>Never with a flame.</b></li></ul>
+   <h3>Use</h3>
+   <ul><li>Light with a <b>friction striker</b>. Never a lighter, never matches, never off hot metal.</li><li>Correct tip for the job, clean, with the right tip cleaner. Do not enlarge an orifice with a drill or wire.</li><li>A popping or squealing torch means shut it down — that is backfire and it precedes flashback.</li><li>Do not hang a lit or unlit torch on a cylinder or regulator.</li></ul>
+   <h3>Shutdown</h3>
+   <ul><li>Close cylinder valves, bleed the lines, back the regulator adjusting screws out, coil the hose off the floor.</li><li>Close valves and secure everything at lunch and end of shift, not just at the end of the job.</li></ul>`}
+  ],
+  quiz:[
+   {q:"What is the maximum working pressure for acetylene?",o:["50 psig","5 psig","15 psig","30 psig"],a:2,
+    e:"15 psig. Above that acetylene can decompose explosively with no oxygen present."},
+   {q:"How must oxygen and fuel gas cylinders be separated in storage?",o:["3 feet apart","Only by a painted line on the floor","They can be stored together if capped","20 feet apart, or a 5 ft noncombustible barrier with a half-hour fire rating"],a:3,
+    e:"20 feet, or a noncombustible barrier at least 5 feet high rated for at least a half hour of fire resistance."},
+   {q:"Why is oil or grease dangerous around oxygen equipment?",o:["Oxygen makes it ignite violently, sometimes from compression heat alone","It voids the warranty","It is not dangerous, only messy","It gums up the regulator"],a:0,
+    e:"Pure oxygen makes ordinary combustibles burn violently and can ignite oil from the heat of compression. No oil, grease, or oily gloves near oxygen."},
+   {q:"You are moving a cylinder across the shop. What is required?",o:["Lift it by the cap with the crane","Valve closed, cap on, secured to a cart","Roll it on its side","Carry it by the valve"],a:1,
+    e:"Valve closed, cap on, upright and secured to a cart. Never lift or carry by the cap or valve, and never use a sling or magnet on a bare cylinder."},
+   {q:"Can you use oxygen to blow dust off your clothes?",o:["Only with a regulator set low","Yes, it is cleaner than shop air","Yes, if you keep it brief","Never — oxygen-saturated clothing ignites from a spark"],a:3,
+    e:"Never. Oxygen-saturated clothing catches from the smallest spark and burns fiercely. This is a recurring cause of fatal burns."}
+  ]},
+
+{ id:'M06', month:'2027-01', title:'Lockout / Tagout & Machine Guarding', refs:'29 CFR 1910.147 · 1910.212 · 1910.219', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'Hazardous energy is more than the plug', b:`<p class="lead">Lockout/tagout is required any time servicing or maintenance could expose you to unexpected startup, energization, or release of stored energy — and where you would have to bypass a guard or put any part of your body into a danger zone.</p>
+   <p>Energy types to account for on shop equipment:</p>
+   <ul><li><b>Electrical</b> — line power, control circuits, backfeed from another source</li><li><b>Stored electrical</b> — capacitors in drives, welders, and controls</li><li><b>Hydraulic and pneumatic</b> — pressure held in cylinders, accumulators, and lines</li><li><b>Mechanical</b> — springs, tensioned belts, flywheels still coasting</li><li><b>Gravity</b> — a raised platen, ram, table, or suspended load that can drop</li><li><b>Thermal</b> — hot surfaces and fluids</li></ul>
+   <p>In a fab shop this means the ironworker, shear, press brake, band saw, drill press, roll, grinder, conveyor, and compressor — plus welding machines when you open a case.</p>`},
+   {h:'The six steps', b:`<ol><li><b>Prepare</b> — know the machine, know every energy source, know the written procedure.</li><li><b>Shut down</b> — normal stopping procedure, not the e-stop as a routine method.</li><li><b>Isolate</b> — operate the energy-isolating device: disconnect, breaker, valve. A control switch or e-stop is <b>not</b> an isolating device.</li><li><b>Lock and tag</b> — your own lock, your own tag with your name on it, on every isolating device.</li><li><b>Release stored energy</b> — block or lower gravity loads, bleed pressure, discharge capacitors, let rotating parts stop.</li><li><b>Verify</b> — try to start the machine, test with a meter, confirm zero energy state. Then return the controls to off.</li></ol>
+   <div class="callout"><b>Step 6 is the one people skip</b>Verification is the step that catches the wrong breaker, the second feed, and the accumulator nobody knew about. If you did not verify, you are not locked out.</div>`},
+   {h:'Locks, tags, and who removes what', b:`<ul><li><b>Each authorized employee applies their own personal lock.</b> If four people are working, four locks are on it, using a hasp or a group lock box.</li><li><b>Only the person who applied a lock removes it.</b> The only exception is a documented procedure with specific steps — verified attempts to reach the person, area cleared, and notification before they return to work. That is a supervisor action, not a shortcut.</li><li>Locks are for lockout only. Do not use a lockout padlock on a toolbox, and do not use your toolbox lock for lockout.</li><li>Tag-only is permitted only where an energy-isolating device physically cannot accept a lock, and then the tag has to provide protection equal to a lock with at least one additional safety measure.</li><li>A tag is a warning. It stops nothing by itself.</li></ul>`},
+   {h:'Shift change and contractors', b:`<ul><li>Locks stay on across shift change. The oncoming worker applies his lock before the outgoing worker removes his — there is never a gap.</li><li>When an outside contractor works on our equipment, both sides brief each other's procedures and both apply locks.</li><li>When we work in a customer's plant, we follow their LOTO program and apply our own locks. Never rely on their word that something is dead — verify it yourself.</li></ul>`},
+   {h:'Machine guarding', b:`<p>Guards protect against the point of operation, rotating parts, flying chips, and sparks.</p>
+   <ul><li><b>Never operate a machine with a guard removed, defeated, or tied back.</b></li><li>If a guard has to come off for maintenance, the machine is locked out, and the guard goes back on before anything is restarted.</li><li>Report a guard that is missing, damaged, or interferes with the work — do not fix the problem by removing it.</li><li>Anchor and secure the machine so it cannot walk or tip during operation.</li><li>Point-of-operation guarding on the ironworker, shear, and brake: keep hands out of the die and pinch points, use hold-downs and reach tools, and do not hold short pieces by hand.</li><li>Rotating shafts, belts, sheaves, and couplings within 7 feet of the floor or work surface get guarded.</li><li>No loose clothing, no gloves, no jewelry, no untucked shirt tails around rotating equipment.</li></ul>`}
+  ],
+  quiz:[
+   {q:"Who may remove a lockout lock?",o:["Only the person who applied it, except by a documented procedure","Maintenance only","Anyone on the crew","The foreman at any time"],a:0,
+    e:"Only the employee who applied it. The narrow exception requires a documented procedure with verified attempts to reach the person and notification before they resume work."},
+   {q:"Which LOTO step gets skipped most often?",o:["Applying the lock","Verifying zero energy by trying to start and testing","Notifying affected employees","Shutting the machine down"],a:1,
+    e:"Verification. It is what catches the wrong breaker, a second feed, or an accumulator nobody knew about. Without it you are not locked out."},
+   {q:"Which is an example of stored energy?",o:["The main disconnect being off","A tagged breaker","A machine sitting idle","A hydraulic accumulator still under pressure"],a:3,
+    e:"Hydraulic and pneumatic pressure, springs, coasting flywheels, capacitors, and raised or suspended loads all hold energy after the power is off."},
+   {q:"When is tag-only acceptable instead of a lock?",o:["Whenever a lock is inconvenient","On short jobs under an hour","Only where the isolating device cannot accept a lock, plus an additional safety measure","Never under any circumstances"],a:2,
+    e:"Only where the device physically cannot be locked, and then the tag must provide protection equal to a lock with at least one additional safety measure."},
+   {q:"A guard was removed to clear a jam. What has to happen?",o:["Run it carefully without the guard","The machine stays locked out and the guard goes back on before restart","Tape a warning sign over the opening","Leave it off if it slows the work"],a:1,
+    e:"Machine locked out while the guard is off, guard reinstalled before anything restarts. Never operate with a guard removed or defeated."}
+  ]},
+
+{ id:'M07', month:'2027-02', title:'Grinding & Abrasive Wheels', refs:'29 CFR 1910.215 · ANSI B7.1', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'The wheel is the hazard', b:`<p class="lead">An abrasive wheel spinning at 10,000+ rpm that comes apart sends pieces out at bullet speed. Grinder injuries in a fab shop are common, and the bad ones are almost always a wheel failure or a removed guard.</p>
+   <ul><li><b>Match the ratings.</b> The maximum rpm marked on the wheel must be equal to or greater than the no-load rpm of the tool. A 4-1/2 in. wheel on a 4-1/2 in. grinder is not automatic — read both.</li><li><b>Inspect every wheel before mounting.</b> Look for cracks, chips, gouges, water damage, and warping.</li><li><b>Ring test</b> vitrified wheels: hang the wheel on a finger or pin and tap the side with a non-metallic handle about 45° off vertical, both sides. A sound wheel rings. A dead thud means scrap it. Ring testing does not apply to thin organic-bonded or reinforced cutoff wheels — inspect those visually.</li><li>Mount with matching blotters and correct flanges, snug but not overtightened. Never force a wheel onto a spindle or bush a hole to fit.</li><li><b>Run a newly mounted wheel at full speed for at least one minute</b> with everyone standing out of the plane of the wheel before you put it to work.</li></ul>`},
+   {h:'Bench and pedestal grinder clearances', b:`<p>Two small gaps do most of the work of keeping a bench grinder from grabbing a part:</p>
+   <ul><li><b>Work rest: 1/8 in. maximum</b> from the wheel face. Any more and the part gets pulled into the gap and jams.</li><li><b>Tongue guard (adjustable top guard): 1/4 in. maximum</b> from the wheel.</li><li>These are adjusted with the wheel <b>stopped</b>, and they need readjusting as the wheel wears down.</li><li>Maximum exposure angle on a bench or pedestal grinder is 90°, and no more than 65° above the horizontal plane of the spindle.</li></ul>
+   <div class="callout"><b>The gap grows on its own</b>Every time the wheel wears, both clearances open up. A grinder that was compliant last month may not be today. Check it before you use it.</div>`},
+   {h:'Right wheel, right way', b:`<ul><li><b>Never side-grind on a Type 1 cutoff wheel.</b> It is built for edge loading only. Side pressure cracks it.</li><li>Do not use a cutoff wheel in a grinder unless the wheel is rated for that tool and the guard is correct for cutting.</li><li>Grinding wheel for grinding, cutting wheel for cutting, flap disc for blending. Do not improvise.</li><li>Do not grind aluminum, brass, or other soft metal on a wheel meant for steel — it loads the wheel and can cause it to burst. Keep a dedicated wheel or use a different method.</li><li><b>Never grind stainless on a wheel used for carbon steel</b> if the part matters — and be aware stainless grinding dust carries chromium.</li><li>Let the tool come up to speed before contact and let it stop on its own — do not set a coasting grinder down.</li><li>Ease into the cut. Do not lean on it; excessive pressure overheats and stresses the wheel.</li></ul>`},
+   {h:'Portable grinders and kickback', b:`<ul><li><b>The guard stays on.</b> A portable grinder guard covers a maximum of 180°, positioned between you and the wheel. Guards get removed for access, and that is how hands and faces get opened up.</li><li>Two hands on the tool with the side handle installed. Keep the cord and lead clear of the wheel.</li><li>Position yourself so the sparks and any wheel fragments go away from you and away from other people, gas cylinders, and combustibles.</li><li>Kickback comes from pinching the wheel in the cut, catching an edge, or plunging. Support the work so the cut cannot close on the wheel.</li><li>Never lock the trigger or wedge the switch on.</li><li>Check that the wheel is seated and the nut tight before every use. Do not change wheels with the tool plugged in.</li></ul>`},
+   {h:'PPE and housekeeping', b:`<ul><li><b>Face shield and safety glasses.</b> Both. Not one.</li><li>Hearing protection — grinders routinely exceed 100 dBA.</li><li>Respiratory protection where the material or coating calls for it. Grinding paint, galvanizing, or stainless puts metal in the air.</li><li>No gloves that can catch, no loose sleeves, nothing dangling.</li><li>Grinding dust is combustible. Sweep it up, keep it away from hot work, and empty collection systems.</li><li>Tag out and report any grinder with a damaged guard, worn spindle, loose bearing, or bad cord. Do not use it and do not let anybody else.</li></ul>`}
+  ],
+  quiz:[
+   {q:"What must be checked before mounting an abrasive wheel?",o:["The wheel color","Nothing if it is new in the box","Only that it fits the spindle","Ring test, visual inspection, and that wheel rpm rating meets or exceeds the tool rpm"],a:3,
+    e:"Ring test vitrified wheels, inspect for cracks and damage, and confirm the wheel’s max rpm is at or above the tool’s no-load rpm."},
+   {q:"Maximum work rest clearance on a bench grinder?",o:["1/8 in.","1/4 in.","1/2 in.","1/16 in."],a:0,
+    e:"1/8 in. maximum. Readjust with the wheel stopped as the wheel wears."},
+   {q:"Maximum tongue guard distance from the wheel?",o:["1 in.","1/8 in.","1/4 in.","1/2 in."],a:2,
+    e:"1/4 in. maximum. Like the work rest, it opens up as the wheel wears and needs regular adjustment."},
+   {q:"After mounting a new wheel, what do you do first?",o:["Start grinding immediately","Run it at full speed at least one minute with everyone out of the wheel plane","Tap it with a hammer while it spins","Grind a scrap piece to break it in"],a:1,
+    e:"Run at full operating speed at least one minute, standing out of the plane of rotation. A defective wheel usually fails in that first minute."},
+   {q:"The guard is in the way of the cut. What do you do?",o:["Find the right tool, wheel, or approach — the guard stays on","Remove it but wear a face shield","Remove it for this one cut","Rotate it out of the way"],a:0,
+    e:"The guard stays on. If it will not work with the guard, the tool or approach is wrong for the job."}
+  ]},
+
+{ id:'M08', month:'2027-03', title:'Fall Protection & Steel Erection', refs:'29 CFR 1926.501 · 1926 Subpart R · 1926.760', cycle:'Annual', scope:'field',
+  sections:[
+   {h:'Trigger heights', b:`<p class="lead">Different heights apply depending on what work you are doing. Know which rule you are under before you get up there.</p>
+   <ul><li><b>General construction (1926.501): 6 feet.</b> Unprotected sides and edges, holes, leading edges, roofs, formwork, walkways over dangerous equipment.</li><li><b>Steel erection (Subpart R): 15 feet</b> for most workers.</li><li><b>Connectors: over 15 feet and up to 30 feet</b> must be provided with fall protection and wear the equipment, and must have the option to tie off or be provided another means.</li><li><b>Controlled decking zone:</b> deckers between 15 and 30 feet may work without tying off only inside a properly established and marked CDZ under specific conditions.</li><li><b>General industry (1910.28): 4 feet</b> — applies to our own shop platforms, mezzanines, and open-sided floors.</li></ul>
+   <p>When two rules could apply, work to the more protective one.</p>`},
+   {h:'Personal fall arrest systems', b:`<p>Anchorage, body harness, connector. All three or it is not a system.</p>
+   <ul><li><b>Anchorage:</b> capable of 5,000 lb per attached person, or designed by a qualified person with a safety factor of at least two. Independent of any anchorage used to support or suspend platforms.</li><li>Anchor <b>at or above</b> the D-ring where possible to limit free fall.</li><li><b>Free fall limited to 6 feet</b> and you must not contact a lower level. Arresting force on the body kept to 1,800 lb with a harness.</li><li>Full body harness only. Body belts are not permitted for fall arrest.</li><li>Snap hooks must be locking type. <b>No hook-to-hook, no hook to a D-ring not designed for it, no tying a knot in a lanyard, and no attaching to a lanyard loop or webbing.</b></li><li>Calculate your clearance: lanyard length + deceleration distance + harness stretch + your height below the D-ring + safety margin. A 6 ft lanyard needs roughly 18-1/2 ft of clearance. On a low tie-off, use a self-retracting lifeline instead.</li></ul>`},
+   {h:'Inspect it every time', b:`<p>Welders destroy fall gear faster than anyone because slag, sparks, and hot metal land on it.</p>
+   <ul><li><b>Webbing:</b> cuts, frays, burns, glazing, melting, chemical damage, pulled or broken stitching, discoloration.</li><li><b>Hardware:</b> cracks, deformation, corrosion, sharp edges, gates that do not lock.</li><li><b>Deceleration pack:</b> any sign of deployment or a broken warning flag.</li><li><b>Labels:</b> legible, with manufacture date. Follow the manufacturer's service life.</li><li><b>Any harness or lanyard that arrested a fall comes out of service permanently.</b> Same for anything with hot slag damage. Tag it, cut it, and throw it away so nobody puts it back in the truck.</li></ul>
+   <div class="callout"><b>Slag and synthetic webbing</b>One spark can glaze or melt webbing to a fraction of its strength with almost nothing to see. If it might have taken slag, inspect it hard, and consider a leather protector or a wire rope lanyard for hot work.</div>`},
+   {h:'Openings, edges, and access', b:`<ul><li>Holes and openings get covered with material capable of at least twice the intended load, secured against displacement, and marked HOLE or COVER.</li><li>Never step on an unmarked cover, never move one without protecting the opening.</li><li>Guardrails: top rail 42 in. ±3, capable of 200 lb applied outward and downward, midrail, and toeboards where things can fall on people below.</li><li>Do not use a guardrail as an anchor point unless it was engineered for it. It is designed to stop a lean, not a fall.</li><li>Ladders: 4:1 pitch, 3 ft above the landing or a grab rail, tied off at the top, three points of contact, face the ladder, no carrying loads that break your grip, no top two rungs of a stepladder.</li><li>Aerial lifts: harness tied to the manufacturer's anchor point inside the basket, gate closed, no standing on the rails, no climbing out at height.</li></ul>`},
+   {h:'Rescue', b:`<p>Arresting the fall is only half of it. A man hanging in a harness is on a clock.</p>
+   <ul><li>Suspension trauma can cause loss of consciousness in as little as a few minutes to a half hour depending on the person and the position.</li><li><b>There has to be a rescue plan before anybody goes up</b> — who, with what equipment, how long. "Call 911" is not a plan by itself, especially in the field.</li><li>Suspension relief straps let the worker take weight off the leg straps and buy time.</li><li>Never work alone at height.</li><li>Anybody who takes a fall gets medical evaluation even if he says he is fine.</li></ul>`}
+  ],
+  quiz:[
+   {q:"General construction fall protection trigger height?",o:["4 feet","6 feet","10 feet","15 feet"],a:1,
+    e:"6 feet under 1926.501 for general construction. Note that general industry — our own shop platforms — triggers at 4 feet."},
+   {q:"Steel erection trigger height for most workers?",o:["25 feet","6 feet","10 feet","15 feet"],a:3,
+    e:"15 feet under Subpart R. Connectors between 15 and 30 feet must be provided fall protection and given the option to tie off."},
+   {q:"Required anchorage strength for a personal fall arrest system?",o:["500 lb","1,800 lb","5,000 lb per person, or engineered with a safety factor of two","No specific requirement"],a:2,
+    e:"5,000 lb per attached person, or designed by a qualified person with a safety factor of at least two, and independent of platform support anchorages."},
+   {q:"You find hot slag burns on your harness webbing. What do you do?",o:["Remove it from service permanently and destroy it","Use it only for short jobs","Use it, the webbing is still thick","Tape over the burns"],a:0,
+    e:"Out of service permanently. Heat damage can cut webbing strength drastically with little visible sign. Tag it, cut it, discard it."},
+   {q:"Why is a rescue plan needed before anyone works at height?",o:["It is only needed over 30 feet","Insurance paperwork","Suspension trauma can incapacitate a suspended worker within minutes","To pick the anchor point"],a:2,
+    e:"Suspension trauma can cause loss of consciousness quickly. There has to be a named rescuer, equipment on site, and a time target — not just a 911 call."}
+  ]},
+
+{ id:'M09', month:'2027-04', title:'Rigging, Slings & Overhead Crane', refs:'29 CFR 1910.179 · 1910.184 · ASME B30', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'Crane inspections', b:`<p class="lead">Overhead crane inspection under 1910.179 runs on two schedules, and one of them has to be written down.</p>
+   <ul><li><b>Frequent — daily to monthly:</b> visual check of operating mechanisms, air and hydraulic lines for leaks, hooks for deformation and cracks, hoist chains and ropes, and functional operating mechanisms including brakes and limit devices.</li><li><b>Periodic — one to twelve months:</b> a deeper inspection covering deformed or cracked members, loose bolts and rivets, worn sheaves and drums, wear on pins, bearings, shafts, gears, brake system parts, and electrical apparatus.</li><li><b>Documented monthly:</b> the inspection of hooks, hoist chains, and running rope requires a <b>signed, dated, certification record</b> kept on file. That is the record an inspector asks for.</li><li>A crane out of service more than a month gets a frequent inspection before use; over six months, a full periodic inspection.</li><li>Rated capacity is legibly marked on both sides of the crane and on the load block. If you cannot read it, you do not know it.</li></ul>`},
+   {h:'Sling angle is not a detail', b:`<p>The more a sling leans away from vertical, the more tension is in it — and the number climbs fast.</p>
+   <ul><li><b>Angle measured from horizontal:</b><br>
+   90° — load factor 1.00<br>
+   60° — load factor 1.155<br>
+   45° — load factor 1.414<br>
+   <b>30° — load factor 2.00</b></li></ul>
+   <p>At 30° from horizontal each leg carries <b>double</b> the share of the load it would carry hanging straight down. A 2,000 lb load on two legs at 30° puts 2,000 lb in each leg, not 1,000. That is how a rated sling gets overloaded on a load that looked light.</p>
+   <ul><li><b>Never rig below 30° from horizontal.</b> 45° or better is the working target.</li><li>Choker hitch reduces capacity, typically to about 80% of the vertical rating.</li><li>Load is not shared evenly on more than two legs unless the rigging is adjustable — with four legs, design for two carrying it.</li></ul>`},
+   {h:'Slings and hardware', b:`<ul><li><b>Every sling needs a legible tag</b> with capacity for each hitch type. No tag, no use — out of service, no exceptions.</li><li><b>Synthetic web and round slings:</b> remove for acid or caustic burns, melting or charring, holes, tears, cuts, snags, broken stitching, worn or distorted fittings, and knots. <b>Slag and sparks destroy synthetic slings — keep them out of the welding area.</b></li><li><b>Wire rope:</b> remove for 10 randomly distributed broken wires in one rope lay, or 5 in one strand; kinking, crushing, birdcaging, heat damage, corrosion, end attachment damage.</li><li><b>Alloy chain:</b> remove for cracks, gouges, stretch, twisted or bent links, wear beyond allowable.</li><li><b>Hooks:</b> remove for cracks, <b>throat opening more than 15% over new</b>, or <b>twist more than 10° from plane</b>. Latches must work.</li><li><b>Softeners or edge protection on every sharp corner.</b> A plate edge cuts a synthetic sling under load quicker than people expect.</li><li>Never shorten a sling with knots, bolts, or by wrapping it around the hook. Never repair a sling in the field.</li><li>Shackles loaded through the bow, pin properly seated. No substituting bolts for shackle pins.</li></ul>`},
+   {h:'Making the lift', b:`<ul><li>Know the actual weight. Estimate high, and confirm against the drawing or the mill weight, not a guess.</li><li>Find the center of gravity. Rig above it or the load rotates when it comes off the ground.</li><li>Take the slack out and <b>trial lift a few inches</b> — verify the rigging, the balance, and the brake before committing.</li><li><b>One designated signal person</b> at a time, in a high-visibility vest, using standard hand signals. Anybody can give a stop signal.</li><li>Nobody rides the load or the hook. <b>Nobody under a suspended load, ever.</b></li><li>Use taglines to control rotation — hands off the load itself.</li><li>Do not side-pull, do not drag a load, and do not use the crane to break something loose.</li><li>Lift smooth, no jerking. Shock loading can multiply the actual force in the rigging far past the static weight.</li><li>Do not leave a load suspended. If it is unavoidable, barricade the area and keep it attended.</li><li><b>The upper limit switch is a safety device, not a stopping device.</b> Do not run the block into it as a normal practice.</li><li>Stop the lift if anything looks wrong. Nobody in this shop will second-guess a stop call.</li></ul>`},
+   {h:'Fabrication-specific traps', b:`<ul><li><b>Never rig through a weld that has not been inspected</b>, and never use a tack weld as a lift point. Lift lugs are engineered, welded to spec, and inspected.</li><li>Long, limber members — trusses, joists, beams — need spreader beams and enough pick points to control deflection. A beam picked at one point can whip or fold.</li><li>Do not let the work lead current return through the crane, hoist, rope, or rigging. Welding current through a bearing or a wire rope destroys it invisibly.</li><li>Keep slings and chains out of the spark stream and off of hot steel.</li><li>Watch the pinch points when landing a load. Hands and feet get caught between the load and the stand, not between the load and the ground.</li></ul>`}
+  ],
+  quiz:[
+   {q:"Two-leg sling at 30° from horizontal versus straight vertical — what happens to leg tension?",o:["It increases about 10%","It stays the same","It roughly doubles","It is cut in half"],a:2,
+    e:"Load factor at 30° from horizontal is 2.00 — each leg carries double. This is how a rated sling gets overloaded on a load that looked light."},
+   {q:"When must a hook be removed from service?",o:["Any surface rust","Throat opening more than 15% over new, or twist over 10°","Only if it is visibly bent in half","Once a year regardless"],a:1,
+    e:"Cracks, throat opening more than 15% over new, or twist more than 10° from plane. Latches must also function."},
+   {q:"Which crane inspection requires a signed, dated record on file?",o:["The monthly inspection of hooks, hoist chains, and running rope","Only the annual","Only after a repair","None are documented"],a:0,
+    e:"The monthly hook, hoist chain, and running rope inspection requires a signed and dated certification record retained on file. That is the document an inspector requests."},
+   {q:"You must leave a load hanging to reposition a stand. What is required?",o:["Have someone stand under it to steady it","Set the brake and walk away","Nothing, it is only a minute","Barricade the area and keep it attended — and avoid it if at all possible"],a:3,
+    e:"Do not leave a suspended load unattended. If unavoidable, barricade the area and keep it attended. Nobody goes under a suspended load, ever."},
+   {q:"What is the upper limit switch for?",o:["A safety backup, not a stopping device","Setting the lift height","Measuring the load","A routine way to stop the hoist at the top"],a:0,
+    e:"It is a safety device. Using it as a routine stop wears it out and eventually it will not be there when it matters."}
+  ]},
+
+{ id:'M10', month:'2027-05', title:'Hearing Conservation & Noise', refs:'29 CFR 1910.95', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'The two numbers', b:`<p class="lead">Noise-induced hearing loss is permanent, painless, and gradual. There is no treatment and no recovery. You do not notice it happening — you notice it years later when you cannot follow a conversation in a restaurant.</p>
+   <ul><li><b>Action level: 85 dBA</b> as an 8-hour time-weighted average. At or above this, a hearing conservation program is required — monitoring, audiograms, protection made available, training.</li><li><b>Permissible exposure limit: 90 dBA</b> as an 8-hour TWA.</li><li><b>Exchange rate: 5 dB.</b> Every 5 dB increase cuts the allowable time in half — 90 dBA for 8 hours, 95 for 4, 100 for 2, 105 for 1.</li><li><b>Ceiling: 115 dBA</b> for any period, and no exposure to impulse or impact noise over 140 dB peak.</li></ul>`},
+   {h:'What our shop sounds like', b:`<p>Typical sound levels for fab shop work:</p>
+   <ul><li>Angle grinder on steel — 95 to 110 dBA</li><li>Needle scaler / chipping hammer — 100 to 115 dBA</li><li>Air chisel — 105 to 115 dBA</li><li>Plasma cutter — 95 to 105 dBA</li><li>Impact wrench — 100 to 110 dBA</li><li>Band saw, drill press — 85 to 95 dBA</li><li>Hammering on plate — impulse peaks well over 120 dB</li><li>Arc welding itself — often only 75 to 85 dBA, which is why people underestimate shop noise. It is the grinding and the chipping that get you.</li></ul>
+   <p>Rule of thumb: if you have to raise your voice to be understood at arm's length, you are around 85 dBA and it is time for protection.</p>`},
+   {h:'Choosing and wearing protection', b:`<p>The Noise Reduction Rating on the package is a laboratory number. Real-world protection is lower, and how you wear it matters far more than which one you buy.</p>
+   <ul><li><b>Foam plugs</b> — highest NRR available, cheapest, and the most commonly worn wrong.</li><li><b>Earmuffs</b> — easier to get right, easier on and off, and they work over a hood. Hair, glasses temples, and hood straps break the seal.</li><li><b>Banded / reusable plugs</b> — convenient for in and out work.</li><li><b>Dual protection</b> — plugs and muffs together for the loudest work. Combined protection is roughly the higher NRR plus 5 dB, not the sum.</li></ul>
+   <h3>Inserting a foam plug correctly</h3>
+   <ol><li>Clean hands. Roll the plug down tight and thin between your fingers.</li><li>Reach over your head with the opposite hand and pull the ear up and out to straighten the canal.</li><li>Insert well into the canal and hold a few seconds while it expands.</li><li>Check it: cup your hands over your ears. If it gets noticeably quieter, the plugs are not in far enough.</li></ol>
+   <div class="callout"><b>Half in is barely in</b>A foam plug just resting in the outer ear gives you a small fraction of its rated protection. Most people who say plugs do not work for them have never had one seated correctly.</div>`},
+   {h:'Audiograms and threshold shift', b:`<ul><li>A baseline audiogram is established within 6 months of first exposure at or above the action level, after at least 14 hours away from workplace noise.</li><li>Annual audiograms follow, compared against the baseline.</li><li><b>Standard threshold shift: an average change of 10 dB or more at 2000, 3000, and 4000 Hz</b> in either ear compared to baseline.</li><li>An STS gets you notified in writing within 21 days, refitted and retrained on protection, and referred for evaluation if needed.</li><li>Getting an STS is not a disciplinary matter. It is information, and catching it early is the entire point of testing.</li><li>Records: exposure measurements kept 2 years, audiometric records kept for the duration of employment.</li></ul>`},
+   {h:'Protecting hearing off the clock', b:`<p>Your ears do not know whether the noise is from work. Total dose is what matters.</p>
+   <ul><li>Firearms without protection is one of the fastest ways to lose hearing — a single unprotected shot can do permanent damage.</li><li>Chainsaws, mowers, leaf blowers, motorcycles, power tools at the house.</li><li>Earbuds at high volume for hours.</li><li>Keep protection in the truck. The cheapest pair you actually wear beats the best pair in the drawer.</li></ul>`}
+  ],
+  quiz:[
+   {q:"At what exposure level is a hearing conservation program required?",o:["90 dBA TWA","100 dBA TWA","80 dBA TWA","85 dBA 8-hour TWA"],a:3,
+    e:"85 dBA as an 8-hour TWA is the action level triggering monitoring, audiograms, available protection, and training. The PEL is 90 dBA."},
+   {q:"What is the permissible exposure limit?",o:["There is no limit with protection","85 dBA 8-hour TWA","90 dBA 8-hour TWA","100 dBA 8-hour TWA"],a:2,
+    e:"90 dBA as an 8-hour TWA, with a 5 dB exchange rate — 95 for 4 hours, 100 for 2, 105 for 1."},
+   {q:"How is a standard threshold shift defined?",o:["Any measurable hearing change","10 dB average change at 2000, 3000, and 4000 Hz from baseline","25 dB loss at any frequency","Total hearing loss in one ear"],a:1,
+    e:"An average shift of 10 dB or more at 2000, 3000, and 4000 Hz in either ear versus baseline. Written notice within 21 days and refitting follow."},
+   {q:"How do you properly insert a foam earplug?",o:["Roll it thin, pull the ear up and out, insert deep, hold while it expands","Wet it first","Insert halfway so you can still hear","Push it in the outer ear"],a:0,
+    e:"Roll it down thin, reach over and pull the ear up and out to straighten the canal, insert well in, hold while it expands, then check the seal."},
+   {q:"Noise-induced hearing loss is:",o:["Temporary, hearing comes back overnight","Permanent and untreatable","Only a problem after age 60","Fixable with hearing aids"],a:1,
+    e:"Permanent, painless, and gradual, with no recovery. Hearing aids amplify but do not restore what is lost. Prevention is the only option."}
+  ]},
+
+{ id:'M11', month:'2027-06', title:'HazCom, SDS & Chemical Safety', refs:'29 CFR 1910.1200', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'Right to understand', b:`<p class="lead">The Hazard Communication Standard says you have a right to know what chemicals you work around and to understand what they can do to you. In this shop that means welding rod and wire, shielding gas, primer, paint, thinner, solvent, degreaser, anti-spatter, cutting fluid, pickling paste, layout dye, adhesives, and fuel.</p>
+   <p>The program has four parts: a written program, labels, safety data sheets, and training. All four have to be there.</p>`},
+   {h:'Reading a label', b:`<p>Every shipped container carries six elements:</p>
+   <ol><li><b>Product identifier</b> — matches the SDS</li><li><b>Signal word</b> — <b>DANGER</b> for the more severe hazards, <b>WARNING</b> for the less severe. Only one appears.</li><li><b>Hazard statements</b> — plain language: "Causes serious eye damage"</li><li><b>Pictograms</b> — red diamond, black symbol</li><li><b>Precautionary statements</b> — prevention, response, storage, disposal</li><li><b>Supplier information</b> — name, address, phone</li></ol>
+   <h3>The pictograms</h3>
+   <ul><li><b>Flame</b> — flammable, self-heating, pyrophoric</li><li><b>Flame over circle</b> — oxidizer</li><li><b>Exploding bomb</b> — explosive, organic peroxide</li><li><b>Gas cylinder</b> — gas under pressure</li><li><b>Corrosion</b> — skin and eye damage, corrosive to metal</li><li><b>Skull and crossbones</b> — acute toxicity, fatal or toxic</li><li><b>Exclamation mark</b> — irritant, narcotic effects, less severe toxicity</li><li><b>Health hazard</b> — carcinogen, mutagen, reproductive toxicity, respiratory sensitizer, organ damage</li><li><b>Environment</b> — aquatic toxicity (not required by OSHA)</li></ul>`},
+   {h:'Safety data sheets', b:`<p>Sixteen sections, same order on every sheet, so you can find what you need fast. The four you will actually reach for:</p>
+   <ul><li><b>Section 2 — Hazard identification.</b> What it does to you, signal word, pictograms, statements.</li><li><b>Section 4 — First-aid measures.</b> What to do right now. Read this one before you need it.</li><li><b>Section 8 — Exposure controls / personal protection.</b> Exposure limits and what PPE and ventilation are required.</li><li><b>Section 7 — Handling and storage.</b> Incompatibilities and storage conditions.</li></ul>
+   <p>Also worth knowing: Section 5 firefighting, Section 6 accidental release, Section 9 physical properties including flash point, Section 10 stability and reactivity, Section 11 toxicological information.</p>
+   <p>SDSs have to be <b>readily accessible during every shift</b> without asking permission and without a delay. Know where the binder is and know how to pull one up. Sections 12 through 15 are not enforced by OSHA but are on the sheet.</p>
+   <div class="callout"><b>New product on the shelf</b>Nothing gets used until the label has been read and the SDS is on file. If a product shows up without a sheet, tell the foreman and leave it alone.</div>`},
+   {h:'Containers in the shop', b:`<ul><li><b>Never remove or deface a label</b> on a shipped container.</li><li>A <b>secondary container</b> — the spray bottle of thinner, the coffee can of solvent — must be labeled with the product identifier and the hazard information. The only exception is a portable container filled from a labeled source and used entirely by the person who filled it within that shift.</li><li><b>Never put a chemical in a food or drink container.</b> Not once, not briefly.</li><li>Keep flammables in approved safety cans and in a flammable storage cabinet. Ground and bond when transferring.</li><li>Store acids and bases apart. Keep oxidizers away from flammables and organics.</li><li>Keep containers closed. Wipe up and dispose of rags in a closed metal container — oily rags self-heat and start fires on their own.</li></ul>`},
+   {h:'Specific hazards on our floor', b:`<ul><li><b>Chlorinated solvents near an arc.</b> Brake cleaner and similar degreasers can form phosgene gas. Approved cleaners only on anything going near heat.</li><li><b>Paint, primer, thinner.</b> Flammable vapor is heavier than air and travels along the floor to an ignition source. Ventilate, no hot work in the spray area, respiratory protection for spraying.</li><li><b>Welding rod and wire.</b> Yes, they have SDSs, and Section 8 tells you what the fume requires.</li><li><b>Pickling paste and passivating acids</b> for stainless — hydrofluoric or nitric acid content, severe burns, specific first aid. Read Section 4 <i>before</i> you open it.</li><li><b>Compressed gases</b> — asphyxiation risk from shielding gas in low or enclosed spaces.</li></ul>
+   <h3>If there is a spill or an exposure</h3>
+   <ol><li>Get clear and get others clear. Kill ignition sources.</li><li>Eyes or skin — flush 15 minutes minimum at the eyewash or shower. Take the SDS with you if you go for treatment.</li><li>Tell the foreman. Every time, including small ones.</li><li>Only clean up a spill you are trained and equipped for. Anything larger, evacuate and call.</li></ol>`}
+  ],
+  quiz:[
+   {q:"Which SDS section covers first-aid measures?",o:["Section 4","Section 8","Section 11","Section 2"],a:0,
+    e:"Section 4. Read it before you open the container, not after somebody gets it in their eyes."},
+   {q:"Which SDS section lists required PPE and exposure limits?",o:["Section 3","Section 6","Section 8","Section 14"],a:2,
+    e:"Section 8, Exposure controls and personal protection."},
+   {q:"You pour thinner into a spray bottle for your own use, and someone else will use it too. What is required?",o:["A piece of tape with your initials","Only the word FLAMMABLE","Nothing, it is obvious what it is","Label it with the product identifier and hazard information"],a:3,
+    e:"Secondary containers need the product identifier and hazard information. The exception only covers a container filled from a labeled source and used entirely by the person who filled it within that shift."},
+   {q:"Which signal word indicates the more severe hazard?",o:["Warning","Danger","Notice","Caution"],a:1,
+    e:"DANGER for more severe hazards, WARNING for less severe. Only one appears on a label."},
+   {q:"A new solvent arrives with no safety data sheet on file. What do you do?",o:["Use it only with gloves","Pour it into a labeled can","Use it, the label is enough","Do not use it — tell the foreman and get the SDS on file"],a:3,
+    e:"Nothing gets used until the label is read and the SDS is on file and accessible. SDSs must be readily available during every shift."}
+  ]},
+
+{ id:'M12', month:'2027-07', title:'Electrical Safety for Welders + Incident Review', refs:'29 CFR 1910.254 · 1910.333 · 1910.304', cycle:'Annual', scope:'all',
+  sections:[
+   {h:'The voltage you ignore', b:`<p class="lead">Welders get comfortable around electricity, and that comfort is the hazard. Open circuit voltage on a stick machine typically runs 20 to 100 volts. It does not take much: current across the chest in the range of 50 milliamps can stop a heart, and 120 V shop circuits kill more people every year than welding machines do.</p>
+   <ul><li>What matters is current through the body, and that depends on your resistance.</li><li><b>Dry skin, dry clothes, dry gloves: high resistance.</b> Sweat, rain, standing water, damp leathers: resistance drops sharply and a voltage that felt like a tingle becomes dangerous.</li><li>Working in a tank, on grating, or against structural steel means you are in contact with ground over a large area — the worst case for a shock path.</li><li>A shock does not have to be fatal to kill you. A jolt at height, on a ladder, or over a running machine kills through the fall.</li></ul>`},
+   {h:'Rules for the welder', b:`<ul><li><b>Never let the electrode or holder touch bare skin, or wet clothing over skin.</b> Not your arm, not under your armpit, not draped over your shoulder.</li><li>Dry gloves in good condition, and dry clothing. Change out of soaked leathers.</li><li>Insulate yourself from the work and from ground — dry plywood, rubber mat, dry board. Do not kneel directly on damp steel or concrete to weld.</li><li>Put the holder in an insulated rack or hook when you set it down. Never on the bench, never on the workpiece, never on a cylinder.</li><li><b>Shut off the machine</b> before changing wire, feeding a new electrode into an unfamiliar holder, or leaving the station.</li><li>Do not change polarity or taps under load — turn the machine off first.</li><li>Never coil or drape leads around your body.</li><li>Two machines, two welders, one part: two open circuit voltages can add across you. Coordinate before you both work the same piece.</li></ul>`},
+   {h:'Work lead and return path', b:`<p>This is the one that quietly destroys equipment and injures people.</p>
+   <ul><li><b>Clamp the work lead directly to the workpiece, as close to the weld as you can get it.</b> Clean, bare metal, tight connection.</li><li><b>Never let welding current find its own way back.</b> Current returning through building steel, a crane, a hoist, a rope, rigging, bearings, a shaft, a machine tool, or piping arcs across every joint and bearing it passes through. It pits bearings, welds wire rope strands, and starts fires inside walls.</li><li><b>The work lead is not a grounding conductor.</b> The equipment grounding conductor protects the machine frame from becoming energized. The work lead is the welding current return path. They are separate things and one does not substitute for the other.</li><li>A poor work clamp connection also gives you bad arc starts and porosity — the electrical problem and the weld problem are the same problem.</li></ul>`},
+   {h:'Cables, cords, and machines', b:`<ul><li>Inspect leads, cords, and connections before every use. Look at the whole length, not the ends.</li><li><b>Exposed conductor is out of service.</b> Electrical tape over a damaged spot is not a repair. Splices and repairs use proper insulated connectors and must have insulation equal to the original cable.</li><li>No splice within 10 feet of the electrode holder.</li><li>Keep leads out of walkways, out of standing water, off of hot metal, and clear of grinding.</li><li>Do not use a lead as a sling, a tie-down, or a handle.</li><li><b>GFCI protection</b> on portable tools, extension cords, and temporary power — always on construction sites and in wet or damp locations.</li><li>Extension cords: heavy-duty three-wire, no missing ground pin, no daisy chains, no running through doorways where they get pinched.</li><li>Never remove the ground pin from a plug or use a cheater adapter.</li><li><b>Lock out the machine before opening a case or servicing anything.</b> Capacitors hold a charge after the disconnect is open. Machine repairs are for qualified personnel only.</li><li>Do not stand a welding machine in water or run it in the rain without proper protection.</li><li>Keep the machine clean, ventilated, and clear of stored material.</li></ul>`},
+   {h:'If someone gets shocked', b:`<ol><li><b>Do not touch him.</b> Kill the power first — disconnect, breaker, machine switch.</li><li>If you cannot kill it, move him clear with a dry non-conductive object. Never with your hands.</li><li>Call 911. Start CPR if there is no pulse. Use an AED if one is available.</li><li><b>Anybody who takes a shock gets medical evaluation</b> even if he feels fine. Cardiac rhythm problems and internal burns can show up later, and internal injury from current does not match how the entry point looks.</li><li>Report it and secure the equipment for investigation.</li></ol>`},
+   {h:'Annual incident review', b:`<p>This is the part where we look at our own year instead of a standard. The foreman covers, with the crew:</p>
+   <ul><li>Every recordable injury, first aid case, and near miss from the past twelve months — what happened and what changed because of it.</li><li>Near misses specifically. The near miss is the free lesson and it only stays free if somebody reports it.</li><li>Any incident in the trade — from a customer's plant, an industry alert, a fatality report — worth learning from.</li><li>Changes to shop practice, tooling, or PPE made in the last year, and why.</li><li>Open items the crew has raised: equipment that needs repair, a job that needs a better method, PPE that is not working.</li><li>What we are watching for in the coming year.</li></ul>
+   <div class="callout"><b>Reporting is not getting somebody in trouble</b>There is no discipline in this shop for reporting a near miss, an injury, or an unsafe condition, and there is none for stopping a job you believe is unsafe. What gets somebody in trouble is staying quiet and letting the next man find out the hard way.</div>`}
+  ],
+  quiz:[
+   {q:"Where does the work lead belong?",o:["Anywhere on the building steel","Clamped directly to the workpiece near the weld","On the crane hook for convenience","Wherever it reaches"],a:1,
+    e:"Directly to the workpiece, close to the weld, on clean bare metal. Letting current return through building steel, a crane, rigging, or bearings arcs across every joint it crosses."},
+   {q:"Why does wet clothing raise shock risk?",o:["It lowers body resistance so more current flows","It attracts the arc","It does not matter if voltage is under 100 V","It makes the machine draw more current"],a:0,
+    e:"Moisture drops your resistance sharply, so a voltage that felt like a tingle dry can push dangerous current through you wet. Change out of soaked gear."},
+   {q:"Where should you set an electrode holder down?",o:["Under your arm while you reposition","In an insulated rack or hook","On the welding machine case","On the workpiece"],a:1,
+    e:"Insulated rack or hook. Never on bare skin, under your arm, on the workpiece, or on a cylinder."},
+   {q:"A welding lead has exposed conductor mid-span. What is acceptable?",o:["Coil that section up out of the way","Wrap it with electrical tape","Out of service until repaired with proper insulated connectors","Use it if the exposed part stays dry"],a:2,
+    e:"Out of service. Repairs use proper insulated connectors with insulation equal to the original cable. Tape is not a repair, and no splice within 10 ft of the holder."},
+   {q:"How does the equipment grounding conductor differ from the work lead?",o:["Only DC machines need a ground","They are the same thing","Grounding protects the machine frame from energizing; the work lead is the welding current return","The work lead is the ground"],a:2,
+    e:"Two separate systems. The grounding conductor keeps the frame from becoming energized. The work lead carries welding current back. Neither substitutes for the other."}
+  ]}
+];
+
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtMonth(ym){ const [y,m]=ym.split('-'); return MONTH_NAMES[+m-1]+' '+y; }
+function fmtDate(iso){ const d=new Date(iso); return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear(); }
+function nowMonth(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- storage (Firebase Firestore, real-time) ---------- */
+const BLANK = { roster:[], records:{}, pin:'1994' };
+let DB = JSON.parse(JSON.stringify(BLANK));
+let STORAGE_OK = false;
+
+async function readRaw(){
+  if(!fbReady) return null;
+  try{
+    const snap = await DOC_REF().get();
+    return snap.exists ? snap.data() : null;
+  }catch(e){ console.error('Firestore read failed', e); return null; }
+}
+async function writeRaw(obj){
+  if(!fbReady) return false;
+  try{ await DOC_REF().set(obj); return true; }
+  catch(e){ console.error('Firestore write failed', e); return false; }
+}
+async function loadDB(){
+  if(!fbReady) return;
+  STORAGE_OK = true;
+  const d = await readRaw();
+  if(d){ DB = Object.assign(JSON.parse(JSON.stringify(BLANK)), d); }
+  else { await writeRaw(DB); }
+
+  /* Live sync: any device's change updates every open screen automatically. */
+  DOC_REF().onSnapshot(snap=>{
+    if(!snap.exists) return;
+    DB = Object.assign(JSON.parse(JSON.stringify(BLANK)), snap.data());
+    render();
+  }, err=>{ console.error('Firestore listener error', err); });
+}
+/* read-modify-write so two phones don't clobber each other */
+async function commit(mutate){
+  let base = STORAGE_OK ? (await readRaw()) : null;
+  if(!base) base = DB;
+  base = Object.assign(JSON.parse(JSON.stringify(BLANK)), base);
+  mutate(base);
+  DB = base;
+  if(STORAGE_OK) await writeRaw(base);
+}
+
+/* ---------- record helpers ---------- */
+const rkey = (empId, modId) => empId+'::'+modId;
+function getRec(empId, modId){ return DB.records[rkey(empId,modId)] || null; }
+function applies(emp, mod){ return mod.scope==='all' || (emp.role||'both')!=='shop'; }
+
+function statusOf(emp, mod){
+  if(!applies(emp,mod)) return 'na';
+  if(getRec(emp.id, mod.id)) return 'done';
+  const cm = nowMonth();
+  if(mod.month > cm) return 'locked';
+  if(mod.month === cm) return 'due';
+  return 'overdue';
+}
+function currentModule(){
+  const cm = nowMonth();
+  return MODULES.find(m=>m.month===cm) || null;
+}
+
+/* ---------- app state ---------- */
+let S = { view:'signin', empId:null, modId:null, step:0, answers:[], graded:null, tab:'status', supAuthed:false };
+const app = document.getElementById('app');
+
+function emp(){ return DB.roster.find(e=>e.id===S.empId) || null; }
+function mod(){ return MODULES.find(m=>m.id===S.modId) || null; }
+
+function toast(msg){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2600);
+}
+function setMast(){
+  document.getElementById('mastMonth').textContent = fmtMonth(nowMonth());
+  const e = emp();
+  document.getElementById('mastWho').textContent =
+    S.view==='sup' ? 'Supervisor' : (e ? e.name : 'Not signed in');
+}
+
+/* ============================ RENDER ============================ */
+function render(){
+  setMast();
+  const v = S.view;
+  if(v==='signin')  app.innerHTML = viewSignin();
+  if(v==='home')    app.innerHTML = viewHome();
+  if(v==='read')    app.innerHTML = viewRead();
+  if(v==='quiz')    app.innerHTML = viewQuiz();
+  if(v==='result')  app.innerHTML = viewResult();
+  if(v==='supPin')  app.innerHTML = viewSupPin();
+  if(v==='sup')     app.innerHTML = viewSup();
+  window.scrollTo(0,0);
+  wire();
+}
+
+/* ---- sign in ---- */
+function viewSignin(){
+  const cm = currentModule();
+  let h = '';
+  if(cm){
+    h += `<div class="hero">
+      <div class="eyebrow">This month · ${fmtMonth(cm.month)}</div>
+      <h2>${esc(cm.title)}</h2>
+      <div class="refs">${esc(cm.refs)}</div>
+      <div style="font-size:15px;color:#CFDDD4;max-width:52ch">Pick your name below to read the module and take the quiz. Takes about ten minutes.</div>
+    </div>`;
+  }
+  h += `<div class="hr"></div><div class="eyebrow">Sign in</div>`;
+  if(!DB.roster.length){
+    h += `<div class="cardbox"><h2>No crew on the roster yet</h2>
+      <p class="sub">A supervisor needs to add names before anyone can log training.</p>
+      <button class="btn" data-go="supPin">Open supervisor tools</button></div>`;
+    return h;
+  }
+  h += `<div class="grid-names">`;
+  DB.roster.filter(e=>e.active!==false).forEach(e=>{
+    const open = MODULES.filter(m=>['due','overdue'].includes(statusOf(e,m))).length;
+    const flag = open>0 ? `<span class="flag">${open} outstanding</span>` : 'All current';
+    h += `<button class="namebtn" data-emp="${e.id}">${esc(e.name)}<small>${flag}</small></button>`;
+  });
+  h += `</div><div class="hr"></div>
+    <button class="linkish" data-go="supPin">Supervisor tools</button>`;
+  if(!STORAGE_OK) h += `<div class="warnbox" style="margin-top:18px"><b>Records not saving</b>The database is not connected, so anything logged now will be lost when the page closes. See Settings for setup.</div>`;
+  return h;
+}
+
+/* ---- employee home ---- */
+function viewHome(){
+  const e = emp(); const cm = currentModule();
+  let h = '';
+  if(cm && applies(e,cm)){
+    const rec = getRec(e.id, cm.id);
+    h += `<div class="hero">
+      <div class="eyebrow">Your module this month · ${fmtMonth(cm.month)}</div>
+      <h2>${esc(cm.title)}</h2>
+      <div class="refs">${esc(cm.refs)}</div>`;
+    if(rec){
+      h += `<div class="done-note">Completed ${fmtDate(rec.date)} · score ${rec.score}%${rec.method==='inperson'?' · in-person session':''}</div>
+        <div style="margin-top:14px"><button class="btn ghost" data-mod="${cm.id}">Review it again</button></div>`;
+    } else {
+      h += `<button class="btn" data-mod="${cm.id}">Start module</button>`;
+    }
+    h += `</div>`;
+  }
+  const open = MODULES.filter(m=>statusOf(e,m)==='overdue');
+  if(open.length){
+    h += `<div class="warnbox" style="margin-top:18px"><b>Past due</b>You have ${open.length} module${open.length>1?'s':''} from earlier months still outstanding. Work through them when you get a chance.</div>`;
+  }
+  h += `<div class="hr"></div><div class="eyebrow">Your training year</div>`;
+  MODULES.forEach((m,i)=>{
+    const st = statusOf(e,m);
+    if(st==='na') return;
+    const rec = getRec(e.id,m.id);
+    const pillTxt = {done:'Complete',due:'Due now',overdue:'Past due',locked:'Scheduled'}[st];
+    const tagOpen = st==='locked' ? `<div class="tag state-locked">` : `<button class="tag state-${st}" data-mod="${m.id}">`;
+    const tagClose = st==='locked' ? `</div>` : `</button>`;
+    h += tagOpen +
+      `<div class="tag-code">${m.id} · ${fmtMonth(m.month)} · ${esc(m.cycle)}</div>
+       <div class="tag-title">${esc(m.title)}</div>
+       <div class="tag-meta">${esc(m.refs)}</div>
+       <div style="margin-top:9px"><span class="pill ${st}">${pillTxt}</span>
+       ${rec?`<span class="tag-meta" style="margin-left:8px">${fmtDate(rec.date)} · ${rec.score}%</span>`:''}</div>` +
+      tagClose;
+  });
+  h += `<div class="hr"></div><button class="linkish" data-go="signin">Sign out</button>`;
+  return h;
+}
+
+/* ---- reader ---- */
+function viewRead(){
+  const m = mod(), e = emp();
+  const sec = m.sections[S.step];
+  const last = S.step === m.sections.length-1;
+  let bar = '<div class="stepbar">' + m.sections.map((_,i)=>`<i class="${i<=S.step?'on':''}"></i>`).join('') + '</div>';
+  return `<div class="eyebrow">${m.id} · ${fmtMonth(m.month)} · ${esc(m.refs)}</div>
+    <h2>${esc(m.title)}</h2>
+    <p class="sub">${esc(e.name)} · ${esc(m.cycle)}</p>
+    ${bar}
+    <div class="reader">
+      <div class="stepnum">Section ${S.step+1} of ${m.sections.length}</div>
+      <h2 style="font-size:22px;margin-bottom:12px">${esc(sec.h)}</h2>
+      ${sec.b}
+    </div>
+    <div class="navrow">
+      <button class="btn ghost sm" data-nav="back">${S.step===0?'Leave module':'Previous'}</button>
+      ${last ? `<button class="btn" data-nav="quiz">Go to the quiz</button>`
+             : `<button class="btn" data-nav="next">Next section</button>`}
+    </div>`;
+}
+
+/* ---- quiz ---- */
+function shuffleQuiz(){
+  const m = mod();
+  S.order = m.quiz.map(q=>{
+    const idx = q.o.map((_,j)=>j);
+    for(let i=idx.length-1;i>0;i--){
+      const r = Math.floor(Math.random()*(i+1));
+      [idx[i],idx[r]] = [idx[r],idx[i]];
+    }
+    return idx;
+  });
+}
+function viewQuiz(){
+  const m = mod();
+  if(!S.order || S.order.length!==m.quiz.length) shuffleQuiz();
+  let h = `<div class="eyebrow">${m.id} · Quiz · ${PASS_PCT}% to pass</div>
+    <h2>${esc(m.title)}</h2>
+    <p class="sub">Answer all ${m.quiz.length} questions, then submit. You can retake it if you come up short.</p>`;
+  m.quiz.forEach((q,i)=>{
+    h += `<div class="q"><div class="qn">Question ${i+1} of ${m.quiz.length}</div>
+      <div class="qt">${esc(q.q)}</div>`;
+    S.order[i].forEach(j=>{
+      h += `<label class="opt"><input type="radio" name="q${i}" value="${j}" ${S.answers[i]===j?'checked':''}><span>${esc(q.o[j])}</span></label>`;
+    });
+    h += `</div>`;
+  });
+  h += `<div class="navrow">
+      <button class="btn ghost sm" data-nav="reread">Back to the reading</button>
+      <button class="btn" id="submitQuiz">Submit answers</button>
+    </div>`;
+  return h;
+}
+
+/* ---- result ---- */
+function viewResult(){
+  const m = mod(), e = emp(), g = S.graded;
+  const pass = g.pct >= PASS_PCT;
+  let h = `<div class="result ${pass?'pass':'fail'}">
+    <div class="score">${g.pct}%</div>
+    <div class="verdict">${pass?'Passed':'Not yet'}</div>
+    <div class="rmeta">${g.right} of ${m.quiz.length} correct · ${PASS_PCT}% required${pass?` · logged ${fmtDate(new Date().toISOString())}`:''}</div>
+  </div>`;
+  h += pass
+    ? `<p>Logged for ${esc(e.name)} — ${esc(m.title)}. Review anything you missed below.</p>`
+    : `<div class="warnbox"><b>Retake required</b>Go back through the sections you missed and take the quiz again. Nothing is logged until you pass.</div>`;
+  m.quiz.forEach((q,i)=>{
+    const chose = S.answers[i], ok = chose===q.a;
+    h += `<div class="q ${ok?'flag-right':'flag-wrong'}"><div class="qn">Question ${i+1} · ${ok?'Correct':'Missed'}</div>
+      <div class="qt">${esc(q.q)}</div>`;
+    (S.order&&S.order[i] ? S.order[i] : q.o.map((_,j)=>j)).forEach(j=>{
+      let cls = 'opt';
+      if(j===q.a) cls += ' correct';
+      else if(j===chose) cls += ' chosen-wrong';
+      h += `<div class="${cls}"><span style="font-family:var(--mono);font-size:12px;min-width:14px">${j===q.a?'\u2713':(j===chose?'\u2717':'')}</span><span>${esc(q.o[j])}</span></div>`;
+    });
+    h += `<div class="why"><b>Why:</b> ${esc(q.e)}</div></div>`;
+  });
+  h += `<div class="navrow">
+    <button class="btn ghost sm" data-nav="reread">Reread the module</button>
+    ${pass?`<button class="btn" data-go="home">Back to my modules</button>`
+           :`<button class="btn" data-nav="retake">Retake the quiz</button>`}
+  </div>`;
+  return h;
+}
+
+/* ---- supervisor ---- */
+function viewSupPin(){
+  return `<div class="cardbox" style="max-width:420px">
+    <div class="eyebrow">Restricted</div>
+    <h2>Supervisor tools</h2>
+    <p class="sub">Roster, completion records, and export.</p>
+    <label class="fld" for="pin">PIN</label>
+    <input type="password" id="pin" inputmode="numeric" autocomplete="off">
+    <div class="navrow"><button class="btn ghost sm" data-go="signin">Cancel</button>
+      <button class="btn" id="pinGo">Open</button></div>
+  </div>`;
+}
+
+function viewSup(){
+  const t = S.tab;
+  let h = `<div class="tabs">
+    ${['status','roster','records','modules','settings'].map(k=>`<button data-tab="${k}" class="${t===k?'on':''}">${{status:'Status',roster:'Crew',records:'Records',modules:'Modules',settings:'Settings'}[k]}</button>`).join('')}
+  </div>`;
+  if(t==='status')   h += supStatus();
+  if(t==='roster')   h += supRoster();
+  if(t==='records')  h += supRecords();
+  if(t==='modules')  h += supModules();
+  if(t==='settings') h += supSettings();
+  h += `<div class="hr"></div><button class="linkish" data-go="signin">Close supervisor tools</button>`;
+  return h;
+}
+
+function supStatus(){
+  const active = DB.roster.filter(e=>e.active!==false);
+  const cm = currentModule();
+  let curDone=0, curTotal=0, overdue=0;
+  active.forEach(e=>{
+    MODULES.forEach(m=>{
+      const st = statusOf(e,m);
+      if(st==='overdue') overdue++;
+      if(cm && m.id===cm.id && st!=='na'){ curTotal++; if(st==='done') curDone++; }
+    });
+  });
+  let h = `<div class="kpis">
+    <div class="kpi"><b>${active.length}</b><span>On the crew</span></div>
+    <div class="kpi ok"><b>${curDone}/${curTotal}</b><span>${cm?esc(cm.title.split(' ')[0])+' this month':'This month'}</span></div>
+    <div class="kpi ${overdue?'warn':''}"><b>${overdue}</b><span>Past due total</span></div>
+  </div>`;
+  if(cm) h += `<p class="sub" style="margin-top:-8px">Current module: <b>${esc(cm.title)}</b> — ${fmtMonth(cm.month)}</p>`;
+  if(!active.length) return h + `<div class="cardbox"><h2>Add your crew first</h2><p class="sub">Go to the Crew tab to add names.</p></div>`;
+
+  h += `<div class="matrix-scroll"><table><thead><tr><th>Name</th>`;
+  MODULES.forEach(m=>{ h += `<th title="${esc(m.title)}">${m.month.slice(5)}/${m.month.slice(2,4)}</th>`; });
+  h += `</tr></thead><tbody>`;
+  active.forEach(e=>{
+    h += `<tr><td class="nm">${esc(e.name)}</td>`;
+    MODULES.forEach(m=>{
+      const st = statusOf(e,m);
+      const ch = {done:'\u2713',due:'!',overdue:'\u00D7',locked:'\u00B7',na:'\u2013'}[st];
+      const rec = getRec(e.id,m.id);
+      const ttl = `${e.name} — ${m.title}${rec?` — ${fmtDate(rec.date)}, ${rec.score}%`:''}`;
+      h += `<td><span class="cell ${st}" title="${esc(ttl)}">${ch}</span></td>`;
+    });
+    h += `</tr>`;
+  });
+  h += `</tbody></table></div>
+  <div class="legend">
+    <span><i class="swatch" style="border-color:var(--lens-2);background:#D8E6DE"></i>Complete</span>
+    <span><i class="swatch" style="border-color:var(--straw);background:var(--straw-lt)"></i>Due this month</span>
+    <span><i class="swatch" style="border-color:var(--cherry);background:var(--cherry-lt)"></i>Past due</span>
+    <span><i class="swatch" style="border-color:var(--hair);background:var(--zinc-dk)"></i>Scheduled</span>
+    <span><i class="swatch" style="border-color:transparent"></i>Not assigned</span>
+  </div>`;
+  return h;
+}
+
+function supRoster(){
+  let h = `<div class="cardbox">
+    <div class="eyebrow">Add someone</div>
+    <div class="row2">
+      <div><label class="fld" for="newName">Name</label><input type="text" id="newName" placeholder="First and last"></div>
+      <div><label class="fld" for="newRole">Assignment</label>
+        <select id="newRole">
+          <option value="both">Shop and field</option>
+          <option value="field">Field</option>
+          <option value="shop">Shop only</option>
+        </select></div>
+      <div style="flex:0 0 auto"><button class="btn" id="addEmp">Add to crew</button></div>
+    </div>
+    <p class="sub" style="margin:12px 0 0">Shop-only skips fall protection and steel erection. Everything else applies to everybody.</p>
+  </div>`;
+  if(!DB.roster.length) return h;
+  h += `<div class="cardbox"><div class="eyebrow">Crew</div>`;
+  DB.roster.forEach(e=>{
+    const done = MODULES.filter(m=>statusOf(e,m)==='done').length;
+    const total = MODULES.filter(m=>applies(e,m)).length;
+    h += `<div class="rosterrow">
+      <div class="who">${esc(e.name)}${e.active===false?' <span class="pill locked">Inactive</span>':''}
+        <div class="tag-meta">${done} of ${total} complete · ${({both:'Shop and field',field:'Field',shop:'Shop only'})[e.role||'both']}</div></div>
+      <select data-role="${e.id}" style="width:auto;flex:0 0 auto">
+        <option value="both" ${(e.role||'both')==='both'?'selected':''}>Shop and field</option>
+        <option value="field" ${e.role==='field'?'selected':''}>Field</option>
+        <option value="shop" ${e.role==='shop'?'selected':''}>Shop only</option>
+      </select>
+      <button class="btn ghost sm" data-toggle="${e.id}">${e.active===false?'Reactivate':'Set inactive'}</button>
+      <button class="btn ghost sm" data-del="${e.id}">Remove</button>
+    </div>`;
+  });
+  h += `</div>`;
+  return h;
+}
+
+function supModules(){
+  const cm = nowMonth();
+  let h = `<div class="cardbox">
+    <div class="eyebrow">Module library</div>
+    <p class="sub" style="margin:0">All twelve, readable and printable no matter what month it is. Open one to read exactly what the crew sees, or print a handout, a paper quiz, or the answer key for a classroom session.</p>
+  </div>`;
+  MODULES.forEach(m=>{
+    const open = S.openMod===m.id;
+    const words = m.sections.reduce((n,s)=>n + s.b.replace(/<[^>]+>/g,' ').split(/\s+/).filter(Boolean).length, 0);
+    const when = m.month===cm ? '<span class="pill due">Current month</span>'
+               : m.month<cm  ? '<span class="pill overdue">Past</span>'
+                             : '<span class="pill locked">Upcoming</span>';
+    h += `<div class="cardbox" style="padding:0;overflow:hidden">
+      <div style="padding:18px 20px">
+        <div class="tag-code">${m.id} · ${fmtMonth(m.month)} · ${esc(m.cycle)}${m.scope==='field'?' · Field crew only':''}</div>
+        <div class="tag-title" style="font-family:var(--disp);font-weight:700;font-size:21px;line-height:1.02;text-transform:uppercase;letter-spacing:.02em;margin:3px 0 5px">${esc(m.title)}</div>
+        <div class="tag-meta">${esc(m.refs)}</div>
+        <div style="margin:10px 0 14px">${when}
+          <span class="tag-meta" style="margin-left:8px">${m.sections.length} sections · ${m.quiz.length} questions · about ${Math.round(words/180)} min read</span></div>
+        <div class="row2">
+          <div style="flex:0 0 auto"><button class="btn sm ${open?'ghost':''}" data-openmod="${m.id}">${open?'Collapse':'Read it'}</button></div>
+          <div style="flex:0 0 auto"><button class="btn ghost sm" data-print="handout:${m.id}">Print handout</button></div>
+          <div style="flex:0 0 auto"><button class="btn ghost sm" data-print="quiz:${m.id}">Print quiz</button></div>
+          <div style="flex:0 0 auto"><button class="btn ghost sm" data-print="key:${m.id}">Print answer key</button></div>
+          <div style="flex:0 0 auto"><button class="btn ghost sm" data-print="signin:${m.id}">Print sign-in sheet</button></div>
+        </div>
+      </div>`;
+    if(open){
+      h += `<div style="border-top:1.5px solid var(--ink);background:var(--zinc);padding:20px">`;
+      m.sections.forEach((s,i)=>{
+        h += `<div class="reader" style="margin-bottom:12px">
+          <div class="stepnum">Section ${i+1} of ${m.sections.length}</div>
+          <h2 style="font-size:20px;margin-bottom:12px">${esc(s.h)}</h2>
+          ${s.b}
+        </div>`;
+      });
+      h += `<div class="eyebrow" style="margin-top:22px">Quiz · ${PASS_PCT}% to pass · answers shown</div>`;
+      m.quiz.forEach((q,i)=>{
+        h += `<div class="q flag-right"><div class="qn">Question ${i+1}</div><div class="qt">${esc(q.q)}</div>`;
+        q.o.forEach((o,j)=>{
+          h += `<div class="opt${j===q.a?' correct':''}"><span style="font-family:var(--mono);font-size:12px;min-width:14px">${j===q.a?'\u2713':''}</span><span>${esc(o)}</span></div>`;
+        });
+        h += `<div class="why"><b>Why:</b> ${esc(q.e)}</div></div>`;
+      });
+      h += `<button class="btn ghost sm" data-openmod="${m.id}">Collapse</button></div>`;
+    }
+    h += `</div>`;
+  });
+  return h;
+}
+
+function supRecords(){
+  const active = DB.roster.filter(e=>e.active!==false);
+  let h = `<div class="cardbox">
+    <div class="eyebrow">Log an in-person session</div>
+    <p class="sub" style="margin-bottom:14px">For toolbox talks and classroom sessions already delivered. Recorded at 100% and marked as an in-person session.</p>
+    <div class="row2">
+      <div><label class="fld" for="logEmp">Who</label><select id="logEmp">
+        <option value="__all">Everybody on the crew</option>
+        ${active.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('')}
+      </select></div>
+      <div><label class="fld" for="logMod">Module</label><select id="logMod">
+        ${MODULES.map(m=>`<option value="${m.id}">${m.id} — ${esc(m.title)}</option>`).join('')}
+      </select></div>
+      <div><label class="fld" for="logDate">Date delivered</label><input type="text" id="logDate" placeholder="MM/DD/YYYY"></div>
+      <div style="flex:0 0 auto"><button class="btn" id="logGo">Record it</button></div>
+    </div>
+  </div>`;
+
+  const rows = Object.values(DB.records).sort((a,b)=> b.date.localeCompare(a.date));
+  h += `<div class="cardbox">
+    <div class="eyebrow">Completion records · ${rows.length}</div>
+    <div class="row2" style="margin-bottom:14px">
+      <div style="flex:0 0 auto"><button class="btn sm" id="exportCsv">Download CSV</button></div>
+      <div style="flex:0 0 auto"><button class="btn ghost sm" id="printSheet">Print sign-in sheet</button></div>
+    </div>`;
+  if(!rows.length){ h += `<p class="sub" style="margin:0">Nothing logged yet. Records appear here as the crew completes modules.</p></div>`; return h; }
+  h += `<div class="matrix-scroll"><table><thead><tr>
+    <th>Date</th><th>Name</th><th>Module</th><th>Score</th><th>Method</th><th>Standard</th><th></th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const e = DB.roster.find(x=>x.id===r.empId);
+    const m = MODULES.find(x=>x.id===r.modId);
+    if(!e||!m) return;
+    h += `<tr><td>${fmtDate(r.date)}</td><td class="nm">${esc(e.name)}</td><td>${esc(m.title)}</td>
+      <td>${r.score}%</td><td>${r.method==='inperson'?'In person':'Online quiz'}</td><td>${esc(m.refs)}</td>
+      <td><button class="linkish" data-rmrec="${rkey(r.empId,r.modId)}" style="font-size:12px">Delete</button></td></tr>`;
+  });
+  h += `</tbody></table></div></div>`;
+  return h;
+}
+
+function supSettings(){
+  return `<div class="cardbox">
+    <div class="eyebrow">Supervisor PIN</div>
+    <div class="row2">
+      <div><label class="fld" for="pinNew">New PIN</label><input type="text" id="pinNew" inputmode="numeric" placeholder="4 or more digits"></div>
+      <div style="flex:0 0 auto"><button class="btn" id="pinSave">Save PIN</button></div>
+    </div>
+  </div>
+  <div class="cardbox">
+    <div class="eyebrow">About the schedule</div>
+    <p>Twelve modules, one per month, each keyed to the month it comes due. When the calendar reaches a module's month it opens for the crew; the month after, anything unfinished shows as past due. The cycle repeats annually — to run the next year, clear the records for a module and it opens again.</p>
+    <p style="margin-bottom:0">Content is drawn from the cited OSHA standards. Review it against how this shop actually works before the crew takes it, and edit the module text in the file where it does not match.</p>
+  </div>
+  <div class="cardbox">
+    <div class="eyebrow">Records</div>
+    <p>${STORAGE_OK?'Records are saved to the shared database, so every phone or computer using this app sees the same roster and the same history in real time. Anyone with the link can see it — it is not private, and it is not password-protected beyond the supervisor PIN.':'The database is not connected. Check that the Firebase config near the top of the file has been filled in, and that Firestore rules allow access. Nothing logged here will persist.'}</p>
+    <button class="btn ghost sm" id="wipe">Clear all records</button>
+    <p class="sub" style="margin:12px 0 0">Clearing removes every completion record. The roster stays. Export a CSV first.</p>
+  </div>`;
+}
+
+/* ============================ EVENTS ============================ */
+function wire(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+    const g=b.dataset.go;
+    if(g==='signin'){ S={...S, view:'signin', empId:null, supAuthed:false}; }
+    else if(g==='supPin'){ S.view = S.supAuthed?'sup':'supPin'; }
+    else S.view=g;
+    render();
+  });
+  document.querySelectorAll('[data-emp]').forEach(b=>b.onclick=()=>{
+    S.empId=b.dataset.emp; S.view='home'; render();
+  });
+  document.querySelectorAll('[data-mod]').forEach(b=>b.onclick=()=>{
+    S.modId=b.dataset.mod; S.step=0; S.answers=[]; S.graded=null; S.order=null; S.view='read'; render();
+  });
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{
+    const n=b.dataset.nav, m=mod();
+    if(n==='next'){ S.step=Math.min(S.step+1,m.sections.length-1); }
+    if(n==='back'){ if(S.step===0){ S.view='home'; } else S.step--; }
+    if(n==='quiz'){ S.view='quiz'; }
+    if(n==='reread'){ S.step=0; S.view='read'; }
+    if(n==='retake'){ S.answers=[]; S.graded=null; S.order=null; S.view='quiz'; }
+    render();
+  });
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ S.tab=b.dataset.tab; render(); });
+
+  const sq = document.getElementById('submitQuiz');
+  if(sq) sq.onclick = submitQuiz;
+
+  const pinGo = document.getElementById('pinGo');
+  if(pinGo){
+    const go = ()=>{
+      const v=document.getElementById('pin').value.trim();
+      if(v===String(DB.pin)){ S.supAuthed=true; S.view='sup'; render(); }
+      else toast('That PIN is not right.');
+    };
+    pinGo.onclick=go;
+    document.getElementById('pin').onkeydown=e=>{ if(e.key==='Enter') go(); };
+  }
+
+  const addEmp = document.getElementById('addEmp');
+  if(addEmp) addEmp.onclick = async ()=>{
+    const name=document.getElementById('newName').value.trim();
+    const role=document.getElementById('newRole').value;
+    if(!name){ toast('Enter a name first.'); return; }
+    const id='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    await commit(d=>{ d.roster.push({id,name,role,active:true}); });
+    toast(name+' added to the crew.'); render();
+  };
+  document.querySelectorAll('[data-role]').forEach(sel=>sel.onchange=async ()=>{
+    const id=sel.dataset.role, v=sel.value;
+    await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.role=v; });
+    render();
+  });
+  document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=async ()=>{
+    const id=b.dataset.toggle;
+    await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.active = e.active===false; });
+    render();
+  });
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=async ()=>{
+    const id=b.dataset.del;
+    const e=DB.roster.find(x=>x.id===id);
+    if(!confirm('Remove '+(e?e.name:'this person')+' and all of their training records? Export a CSV first if you need the history.')) return;
+    await commit(d=>{
+      d.roster = d.roster.filter(x=>x.id!==id);
+      Object.keys(d.records).forEach(k=>{ if(k.startsWith(id+'::')) delete d.records[k]; });
+    });
+    toast('Removed.'); render();
+  });
+  document.querySelectorAll('[data-rmrec]').forEach(b=>b.onclick=async ()=>{
+    const k=b.dataset.rmrec;
+    if(!confirm('Delete this completion record?')) return;
+    await commit(d=>{ delete d.records[k]; });
+    toast('Record deleted.'); render();
+  });
+
+  const logGo = document.getElementById('logGo');
+  if(logGo) logGo.onclick = async ()=>{
+    const who=document.getElementById('logEmp').value;
+    const modId=document.getElementById('logMod').value;
+    const dv=document.getElementById('logDate').value.trim();
+    let iso=new Date().toISOString();
+    if(dv){
+      const p=dv.split(/[\/\-]/);
+      if(p.length===3){
+        const d=new Date(+p[2], +p[0]-1, +p[1]);
+        if(!isNaN(d)) iso=d.toISOString(); else { toast('Use MM/DD/YYYY for the date.'); return; }
+      } else { toast('Use MM/DD/YYYY for the date.'); return; }
+    }
+    const targets = who==='__all' ? DB.roster.filter(e=>e.active!==false) : DB.roster.filter(e=>e.id===who);
+    const m = MODULES.find(x=>x.id===modId);
+    const use = targets.filter(e=>applies(e,m));
+    if(!use.length){ toast('That module does not apply to who you picked.'); return; }
+    await commit(d=>{
+      use.forEach(e=>{ d.records[rkey(e.id,modId)] = {empId:e.id, modId, date:iso, score:100, method:'inperson'}; });
+    });
+    toast('Logged for '+use.length+(use.length>1?' people.':' person.')); render();
+  };
+
+  const ex = document.getElementById('exportCsv');
+  if(ex) ex.onclick = exportCsv;
+  const pr = document.getElementById('printSheet');
+  if(pr) pr.onclick = ()=>printDoc('signin', (currentModule()||MODULES[0]).id);
+
+  document.querySelectorAll('[data-openmod]').forEach(b=>b.onclick=()=>{
+    S.openMod = S.openMod===b.dataset.openmod ? null : b.dataset.openmod;
+    render();
+  });
+  document.querySelectorAll('[data-print]').forEach(b=>b.onclick=()=>{
+    const [kind,id] = b.dataset.print.split(':');
+    printDoc(kind, id);
+  });
+
+  const pinSave = document.getElementById('pinSave');
+  if(pinSave) pinSave.onclick = async ()=>{
+    const v=document.getElementById('pinNew').value.trim();
+    if(v.length<4){ toast('Use at least four digits.'); return; }
+    await commit(d=>{ d.pin=v; });
+    toast('PIN saved.'); document.getElementById('pinNew').value='';
+  };
+  const wipe = document.getElementById('wipe');
+  if(wipe) wipe.onclick = async ()=>{
+    if(!confirm('Delete every completion record for everyone? This cannot be undone.')) return;
+    await commit(d=>{ d.records={}; });
+    toast('All records cleared.'); render();
+  };
+
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.onchange=()=>{
+    const i=+r.name.slice(1); S.answers[i]=+r.value;
+  });
+}
+
+async function submitQuiz(){
+  const m=mod(), e=emp();
+  if(S.answers.filter(a=>a!==undefined && a!==null).length < m.quiz.length){
+    toast('Answer all '+m.quiz.length+' questions before submitting.'); return;
+  }
+  let right=0;
+  m.quiz.forEach((q,i)=>{ if(S.answers[i]===q.a) right++; });
+  const pct = Math.round(right/m.quiz.length*100);
+  S.graded = {right, pct};
+  if(pct >= PASS_PCT){
+    await commit(d=>{
+      d.records[rkey(e.id,m.id)] = {empId:e.id, modId:m.id, date:new Date().toISOString(), score:pct, method:'quiz'};
+    });
+  }
+  S.view='result'; render();
+}
+
+function exportCsv(){
+  const rows=[['Date','Employee','Assignment','Module ID','Module','Due Month','Standard','Score %','Method']];
+  Object.values(DB.records).sort((a,b)=>b.date.localeCompare(a.date)).forEach(r=>{
+    const e=DB.roster.find(x=>x.id===r.empId), m=MODULES.find(x=>x.id===r.modId);
+    if(!e||!m) return;
+    rows.push([fmtDate(r.date), e.name, ({both:'Shop and field',field:'Field',shop:'Shop only'})[e.role||'both'],
+      m.id, m.title, fmtMonth(m.month), m.refs, r.score, r.method==='inperson'?'In-person session':'Online quiz']);
+  });
+  const csv = rows.map(r=>r.map(c=>{
+    const s=String(c); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');
+  a.href=url; a.download='WWS-safety-training-records-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  toast('CSV downloaded.');
+}
+
+function printHeader(m, subtitle){
+  return `<h1 style="margin:0 0 2px;font-size:19pt">Wilson Welding Service</h1>
+    <div style="font-size:11pt;margin-bottom:4px">Safety Training — ${esc(subtitle)}</div>
+    <div style="border-bottom:2px solid #000;margin-bottom:14px"></div>
+    <div style="font-size:11pt;line-height:1.5;margin-bottom:18px">
+      <b>Module ${esc(m.id)} — ${esc(m.title)}</b><br>
+      Standard: ${esc(m.refs)}<br>
+      Scheduled: ${fmtMonth(m.month)} &nbsp;·&nbsp; Cycle: ${esc(m.cycle)}${m.scope==='field'?' &nbsp;·&nbsp; Field crew only':''}
+    </div>`;
+}
+
+function printDoc(kind, modId){
+  const m = MODULES.find(x=>x.id===modId) || currentModule() || MODULES[0];
+  const area = document.getElementById('printArea');
+  let h = `<div class="pdoc">`;
+
+  if(kind==='handout'){
+    h += printHeader(m,'Participant Handout');
+    m.sections.forEach((s,i)=>{
+      h += `<h2 style="font-size:13pt;margin:20px 0 6px;border-bottom:1px solid #999;padding-bottom:3px">
+        ${i+1}. ${esc(s.h)}</h2>${s.b}`;
+    });
+    h += `<div style="border-top:2px solid #000;margin-top:26px;padding-top:10px;font-size:9.5pt">
+      Reviewed with: ______________________________ &nbsp;&nbsp; Date: ____________ &nbsp;&nbsp; Instructor: ____________________</div>`;
+  }
+
+  if(kind==='quiz'){
+    h += printHeader(m,'Quiz');
+    h += `<div style="font-size:11pt;margin-bottom:16px">
+      Name: ______________________________________ &nbsp;&nbsp; Date: ______________<br>
+      <span style="font-size:10pt">Circle one answer per question. ${PASS_PCT}% required to pass — ${Math.ceil(m.quiz.length*PASS_PCT/100)} of ${m.quiz.length} correct.</span></div>`;
+    m.quiz.forEach((q,i)=>{
+      h += `<div style="margin-bottom:18px;page-break-inside:avoid">
+        <div style="font-weight:bold;font-size:11pt;margin-bottom:6px">${i+1}. ${esc(q.q)}</div>`;
+      q.o.forEach((o,j)=>{
+        h += `<div style="margin:0 0 4px 22px;font-size:11pt">${'ABCD'[j]}. &nbsp;${esc(o)}</div>`;
+      });
+      h += `</div>`;
+    });
+    h += `<div style="border-top:2px solid #000;margin-top:22px;padding-top:10px;font-size:9.5pt">
+      Score: _______ / ${m.quiz.length} &nbsp;( _______ % ) &nbsp;&nbsp; Pass / Fail &nbsp;&nbsp; Graded by: ____________________
+      <p style="margin-top:12px">By signing I confirm I received this training, that it was presented in a language and vocabulary I understand, and that I had the opportunity to ask questions.</p>
+      <p style="margin-top:14px">Signature: ______________________________________ &nbsp;&nbsp; Date: ______________</p></div>`;
+  }
+
+  if(kind==='key'){
+    h += printHeader(m,'Answer Key — Instructor Copy');
+    m.quiz.forEach((q,i)=>{
+      h += `<div style="margin-bottom:16px;page-break-inside:avoid">
+        <div style="font-weight:bold;font-size:11pt">${i+1}. ${esc(q.q)}</div>
+        <div style="margin:4px 0 4px 22px;font-size:11pt">
+          <b>Answer: ${'ABCD'[q.a]} — ${esc(q.o[q.a])}</b></div>
+        <div style="margin-left:22px;font-size:10pt;color:#333">${esc(q.e)}</div>
+      </div>`;
+    });
+    h += `<div style="border-top:2px solid #000;margin-top:20px;padding-top:10px;font-size:9.5pt">
+      Passing score: ${Math.ceil(m.quiz.length*PASS_PCT/100)} of ${m.quiz.length} (${PASS_PCT}%). Do not distribute this page with the quiz.</div>`;
+  }
+
+  if(kind==='signin'){
+    const active = DB.roster.filter(e=>e.active!==false).filter(e=>applies(e,m));
+    const rows = active.map(e=>`<tr><td style="width:34%">${esc(e.name)}</td><td class="sig"></td><td style="width:14%"></td></tr>`).join('')
+      + '<tr><td class="sig"></td><td class="sig"></td><td></td></tr>'.repeat(active.length?3:8);
+    h += printHeader(m,'Attendance Record');
+    h += `<div style="font-size:11pt;margin-bottom:14px">
+      Date delivered: ______________________ &nbsp;&nbsp; Instructor: ______________________________</div>
+      <table><thead><tr><th>Printed name</th><th>Signature</th><th>Score</th></tr></thead><tbody>${rows}</tbody></table>
+      <p style="font-size:9.5pt;margin-top:14px">By signing above I confirm I attended this training session, that the material was presented in a language and vocabulary I understand, and that I had the opportunity to ask questions.</p>
+      <p style="font-size:9.5pt;margin-top:20px">Instructor signature: ______________________________________ &nbsp;&nbsp; Date: ______________</p>`;
+  }
+
+  h += `</div>`;
+  area.innerHTML = h;
+  window.print();
+}
+
+/* ---------- boot ---------- */
+(async function(){
+  await loadDB();
+  render();
+})();
+
+/* ---------- PWA install support ---------- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(e=>console.error('SW register failed', e));
+  });
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+</script>
