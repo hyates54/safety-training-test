@@ -963,13 +963,14 @@ function viewSupPin(){
 function viewSup(){
   const t = S.tab;
   let h = `<div class="tabs">
-    ${['status','roster','records','modules','settings'].map(k=>`<button data-tab="${k}" class="${t===k?'on':''}">${{status:'Status',roster:'Crew',records:'Records',modules:'Modules',settings:'Settings'}[k]}</button>`).join('')}
+    ${['status','roster','reminders','records','modules','settings'].map(k=>`<button data-tab="${k}" class="${t===k?'on':''}">${{status:'Status',roster:'Crew',reminders:'Reminders',records:'Records',modules:'Modules',settings:'Settings'}[k]}</button>`).join('')}
   </div>`;
-  if(t==='status')   h += supStatus();
-  if(t==='roster')   h += supRoster();
-  if(t==='records')  h += supRecords();
-  if(t==='modules')  h += supModules();
-  if(t==='settings') h += supSettings();
+  if(t==='status')    h += supStatus();
+  if(t==='roster')    h += supRoster();
+  if(t==='reminders') h += supReminders();
+  if(t==='records')   h += supRecords();
+  if(t==='modules')   h += supModules();
+  if(t==='settings')  h += supSettings();
   h += `<div class="hr"></div><button class="linkish" data-go="signin">Close supervisor tools</button>`;
   return h;
 }
@@ -1018,13 +1019,58 @@ function supStatus(){
   return h;
 }
 
+function supReminders(){
+  const active = DB.roster.filter(e=>e.active!==false);
+  const cm = currentModule();
+  const APP_URL = window.location.href.split('#')[0].split('?')[0];
+
+  // Build a list of who has anything outstanding, oldest-overdue first
+  const rows = [];
+  active.forEach(e=>{
+    const outstanding = MODULES.filter(m => applies(e,m) && ['due','overdue'].includes(statusOf(e,m)));
+    if(!outstanding.length) return;
+    // Prefer the oldest overdue module; otherwise the current month's if outstanding; otherwise whatever's outstanding.
+    const currentDue = outstanding.find(m => cm && m.id===cm.id);
+    const overdueOnes = outstanding.filter(m => statusOf(e,m)==='overdue').sort((a,b)=>a.month.localeCompare(b.month));
+    const target = overdueOnes[0] || currentDue || outstanding[0];
+    const isOverdue = statusOf(e,target)==='overdue';
+    rows.push({emp:e, mod:target, isOverdue, count:outstanding.length});
+  });
+
+  let h = `<div class="cardbox">
+    <div class="eyebrow">Text reminders</div>
+    <p class="sub" style="margin-bottom:4px">No cost, no setup — tap "Text reminder" next to a name and your phone opens a message already written. You just hit send.</p>
+    <p class="sub" style="margin:0">Add a mobile number for someone under the Crew tab to enable this for them.</p>
+  </div>`;
+
+  if(!rows.length){
+    h += `<div class="cardbox"><p class="sub" style="margin:0">Nobody has an outstanding module right now — everyone active is caught up.</p></div>`;
+    return h;
+  }
+
+  rows.forEach(r=>{
+    const e = r.emp, m = r.mod;
+    const phoneDigits = String(e.phone||'').replace(/\D/g,'');
+    const hasPhone = phoneDigits.length >= 10;
+    const msg = r.isOverdue
+      ? `Hi ${e.name.split(' ')[0]}, your WWS safety training "${m.title}" is past due. When you get a chance: ${APP_URL}`
+      : `Hi ${e.name.split(' ')[0]}, your WWS safety training "${m.title}" is due this month. Takes about 10 minutes: ${APP_URL}`;
+    const smsHref = hasPhone ? `sms:${phoneDigits}?&body=${encodeURIComponent(msg)}` : null;
+
+    h += `<div class="rosterrow" style="align-items:center">
+      <div class="who">${esc(e.name)}
+        <div class="tag-meta">${r.isOverdue?'Past due':'Due this month'} · ${esc(m.title)}${r.count>1?` · ${r.count} outstanding total`:''}</div>
+      </div>
+      ${hasPhone
+        ? `<a class="btn sm" href="${smsHref}">Text reminder</a>`
+        : `<span class="pill locked">No phone on file</span>`}
+    </div>`;
+  });
+
+  return h;
+}
+
 function supRoster(){
-  const CARRIERS = [
-    ['','Select carrier'],['att','AT&T'],['verizon','Verizon'],['tmobile','T-Mobile'],
-    ['sprint','Sprint'],['boost','Boost Mobile'],['cricket','Cricket'],['uscellular','US Cellular'],
-    ['metro','Metro by T-Mobile'],['googlefi','Google Fi'],['other','Other/Unknown']
-  ];
-  const carrierOpts = (sel) => CARRIERS.map(([v,l])=>`<option value="${v}" ${sel===v?'selected':''}>${l}</option>`).join('');
   let h = `<div class="cardbox">
     <div class="eyebrow">Add someone</div>
     <div class="row2">
@@ -1036,10 +1082,9 @@ function supRoster(){
           <option value="shop">Shop only</option>
         </select></div>
       <div><label class="fld" for="newPhone">Mobile number</label><input type="text" id="newPhone" placeholder="404-555-0100" inputmode="tel"></div>
-      <div><label class="fld" for="newCarrier">Carrier</label><select id="newCarrier">${carrierOpts('')}</select></div>
       <div style="flex:0 0 auto"><button class="btn" id="addEmp">Add to crew</button></div>
     </div>
-    <p class="sub" style="margin:12px 0 0">Shop-only skips fall protection and steel erection. Everything else applies to everybody. Phone and carrier are optional but required for text reminders.</p>
+    <p class="sub" style="margin:12px 0 0">Shop-only skips fall protection and steel erection. Everything else applies to everybody. Phone number is optional but enables the Reminders tab.</p>
   </div>`;
   if(!DB.roster.length) return h;
   h += `<div class="cardbox"><div class="eyebrow">Crew</div>`;
@@ -1055,7 +1100,6 @@ function supRoster(){
         <option value="shop" ${e.role==='shop'?'selected':''}>Shop only</option>
       </select>
       <input type="text" data-phone="${e.id}" value="${esc(e.phone||'')}" placeholder="Mobile number" style="width:150px;flex:0 0 auto">
-      <select data-carrier="${e.id}" style="width:auto;flex:0 0 auto">${carrierOpts(e.carrier||'')}</select>
       <button class="btn ghost sm" data-toggle="${e.id}">${e.active===false?'Reactivate':'Set inactive'}</button>
       <button class="btn ghost sm" data-del="${e.id}">Remove</button>
     </div>`;
@@ -1221,10 +1265,9 @@ function wire(){
     const name=document.getElementById('newName').value.trim();
     const role=document.getElementById('newRole').value;
     const phone=document.getElementById('newPhone').value.trim();
-    const carrier=document.getElementById('newCarrier').value;
     if(!name){ toast('Enter a name first.'); return; }
     const id='e'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-    await commit(d=>{ d.roster.push({id,name,role,phone,carrier,active:true}); });
+    await commit(d=>{ d.roster.push({id,name,role,phone,active:true}); });
     toast(name+' added to the crew.'); render();
   };
   document.querySelectorAll('[data-role]').forEach(sel=>sel.onchange=async ()=>{
@@ -1236,11 +1279,6 @@ function wire(){
     const id=inp.dataset.phone, v=inp.value.trim();
     await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.phone=v; });
     toast('Phone number saved.');
-  });
-  document.querySelectorAll('[data-carrier]').forEach(sel=>sel.onchange=async ()=>{
-    const id=sel.dataset.carrier, v=sel.value;
-    await commit(d=>{ const e=d.roster.find(x=>x.id===id); if(e) e.carrier=v; });
-    toast('Carrier saved.');
   });
   document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=async ()=>{
     const id=b.dataset.toggle;
